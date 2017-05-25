@@ -13,3 +13,12 @@ shuffle*
 
 # cluster logs
 LOGS/*
+
+# temporary files
+tmp
+
+# data files
+data
+
+# plink executables
+plink

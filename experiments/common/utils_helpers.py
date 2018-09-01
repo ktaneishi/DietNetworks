@@ -2,17 +2,11 @@ from __future__ import print_function
 import os
 import numpy as np
 from DietNetworks.experiments.common import dataset_utils as du
+import sys
 
+def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
+                               feature_splits=None, fold=0, perclass=False):
 
-def generate_1000_genomes_hist(transpose=False, label_splits=None,
-                               feature_splits=None, fold=0, perclass=False,
-                               path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'):
-
-    """
-    train, valid, test, _ = du.load_1000_genomes(transpose, label_splits,
-                                                 feature_splits, fold,
-                                                 norm=False)
-    """
     train, valid, test, _ = du.load_1000_genomes(transpose=transpose,
                                                  label_splits=label_splits,
                                                  feature_splits=feature_splits,
@@ -25,8 +19,7 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None,
 
     nolabel_y = nolabel_y.argmax(axis=1)
 
-    filename = 'histo3x26' if perclass else \
-        'histo3'
+    filename = 'histo3x26' if perclass else 'histo3'
     filename += '_fold' + str(fold) + '.npy'
 
     if perclass:
@@ -56,11 +49,9 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None,
 
     np.save(os.path.join(path, filename), nolabel_x)
 
-
 def generate_1000_genomes_bag_of_genes(
-        transpose=False, label_splits=None,
-        feature_splits=[0.8], fold=0,
-        path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'):
+        path, transpose=False, label_splits=None,
+        feature_splits=[0.8], fold=0):
 
     train, valid, test, _ = du.load_1000_genomes(transpose, label_splits,
                                                  feature_splits, fold,
@@ -85,12 +76,9 @@ def generate_1000_genomes_bag_of_genes(
 
     nolabel_x[mod1] += 1
     nolabel_x[mod2] += 1
-    # import ipdb; ipdb.set_trace()
 
-
-def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
-                                  feature_splits=None, fold=0,
-                                  path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'):
+def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
+                                  feature_splits=None, fold=0):
 
     train, valid, test, _ = du.load_1000_genomes_old(transpose, label_splits,
                                                      feature_splits, fold,
@@ -110,9 +98,9 @@ def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
 
     np.save(os.path.join(path, filename), nolabel_x)
 
-
 if __name__ == '__main__':
+    path = sys.argv[1]
     for f in range(5):
         print(str(f))
-        generate_1000_genomes_hist(transpose=False, label_splits=[.75],
-                                   feature_splits=[1.], fold=f, perclass=True, path='data/')
+        generate_1000_genomes_hist(path=path, transpose=False, label_splits=[.75],
+                                   feature_splits=[1.], fold=f, perclass=True)

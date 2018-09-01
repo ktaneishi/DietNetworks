@@ -1,17 +1,12 @@
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 import numpy
 import os
 
-
-def load_data(path="/Tmp/carriepl/Genomics_Datasets/1000_Genome_project/",
-              force_pkl_recreation=False):
+def load_data(path, force_pkl_recreation=False):
 
     dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_dataset.pkl"
     genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_A.raw"
-    label_file = "affy_samples.20141118.panel"
+    label_file = "data/affy_samples.20141118.panel"
     
     if os.path.exists(path + dataset_file) and not force_pkl_recreation:
         with open(path + dataset_file, "rb") as f:
@@ -35,7 +30,7 @@ def load_data(path="/Tmp/carriepl/Genomics_Datasets/1000_Genome_project/",
     
     # Load the label file
     label_dict = {}
-    with open(path + label_file, "r") as f:
+    with open(label_file, "r") as f:
         for line in f.readlines()[1:]:
             patient_id, ethnicity, _ = line.split()
             label_dict[patient_id] = ethnicity

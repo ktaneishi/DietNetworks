@@ -7,8 +7,7 @@ import os
 import numpy as np
 import time
 
-def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
-        dataset_path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'):
+def pca(dataset, n_comp_list, save_path, dataset_path, method="pca", which_fold=0):
 
     # Load the dataset
     print("Loading data")
@@ -61,7 +60,7 @@ if __name__ == '__main__':
                         help='dataset')
     parser.add_argument('-save_path',
                         '-sp',
-                        default='/data/lisatmp4/romerosa/DietNetworks/pca/',
+                        default,
                         help='number of components for embedding')
 
     args = parser.parse_args()

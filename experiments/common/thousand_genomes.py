@@ -6,7 +6,7 @@ def load_data(path, force_pkl_recreation=False):
 
     dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_dataset.pkl"
     genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_A.raw"
-    label_file = "data/affy_samples.20141118.panel"
+    label_file = "../data/affy_samples.20141118.panel"
     
     if os.path.exists(path + dataset_file) and not force_pkl_recreation:
         with open(path + dataset_file, "rb") as f:
@@ -30,7 +30,7 @@ def load_data(path, force_pkl_recreation=False):
     
     # Load the label file
     label_dict = {}
-    with open(label_file, "r") as f:
+    with open(os.path.join(path, label_file), "r") as f:
         for line in f.readlines()[1:]:
             patient_id, ethnicity, _ = line.split()
             label_dict[patient_id] = ethnicity
@@ -53,7 +53,6 @@ def load_data(path, force_pkl_recreation=False):
         pickle.dump((genomic_data, label_data), f, pickle.HIGHEST_PROTOCOL)
 
     return genomic_data, label_data
-
 
 if __name__ == '__main__':
     x = load_data(force_pkl_recreation=True)

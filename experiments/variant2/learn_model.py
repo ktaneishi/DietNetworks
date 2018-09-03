@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from __future__ import print_function
 import argparse
 import time
@@ -29,9 +28,9 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             max_patience=100, batchnorm=0, keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
             early_stop_criterion='loss_sup_det',
-            save_path='/Tmp/romerosa/DietNetworks/newmodel/',
-            save_copy='/Tmp/romerosa/DietNetworks/',
-            dataset_path='/Tmp/' + os.environ["USER"] + '/datasets/',
+            save_path='./',
+            save_copy='./',
+            dataset_path='./',
             resume=False, exp_name='', random_proj=0):
 
     # Prepare embedding information
@@ -161,14 +160,6 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Define inputs
     inputs = [input_var_sup, target_var_sup]
 
-    """
-    # Define parameters
-    params = lasagne.layers.get_all_params(
-        [discrim_net]+filter(None, nets), trainable=True)
-    params_to_freeze= \
-        lasagne.layers.get_all_params(filter(None, nets), trainable=False)
-    """
-
     # Define parameters
     params = lasagne.layers.get_all_params(
         [discrim_net]+list(filter(None, nets)), trainable=True, unwrap_shared=False)
@@ -217,11 +208,6 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         updates = lasagne.updates.adam(loss,
                                        params,
                                        learning_rate=lr)
-    # updates = lasagne.updates.sgd(loss,
-    #                               params,
-    #                               learning_rate=lr)
-    # updates = lasagne.updates.momentum(loss, params,
-    #                                    learning_rate=lr, momentum=0.0)
 
     # Apply norm constraints on the weights
     for k in updates.keys():
@@ -433,7 +419,6 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
 
-
 def main():
     parser = argparse.ArgumentParser(description="""Train Diet Networks""")
     parser.add_argument('--dataset',
@@ -547,7 +532,7 @@ def main():
                             '$SCRATCH'+'/DietNetworks/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
-                        default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/data_files/300k/',
+                        default='./',
                         help='Path to dataset')
     parser.add_argument('-resume',
                         type=bool,
@@ -596,7 +581,6 @@ def main():
             args.resume,
             args.exp_name,
             int(args.random_proj))
-
 
 if __name__ == '__main__':
     main()

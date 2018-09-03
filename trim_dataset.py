@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 
 snp_to_int = {'A': 1, 'AA': 2, 'AC': 3, 'AG': 4, 'AT': 5,
               'C': 6, 'CC': 7, 'CG': 8, 'CT': 9, 'D': 10,
@@ -14,7 +14,7 @@ def replace_inplace(arr, to_replace, replace_with):
 def trim_dataset():
     
     # Load the existing data
-    o_data = numpy.load(os.path.join(path, 'ma_dataset.npy'))
+    o_data = np.load(os.path.join(path, 'ma_dataset.npy'))
     
     # Step 1 : remove from the dataset all the features that have only
     # one possible value or two possible values but one of those is 'missing'
@@ -27,7 +27,7 @@ def trim_dataset():
         if i % 10000 == 0:
             print(i, o_data.shape[1])
                 
-        uniques = numpy.unique(o_data[:,i])
+        uniques = np.unique(o_data[:,i])
         nb_uniques = len(uniques)
         
         if nb_uniques >= 3 or (nb_uniques == 2 and 0 not in uniques):
@@ -38,12 +38,12 @@ def trim_dataset():
     # Step 2 : Replace any single-letter SNP by the double letter equivalent
     print("Step 2")
     
-    numpy.place(n_data, n_data == snp_to_int['A'], snp_to_int['AA'])
-    numpy.place(n_data, n_data == snp_to_int['C'], snp_to_int['CC'])
-    numpy.place(n_data, n_data == snp_to_int['D'], snp_to_int['DD'])
-    numpy.place(n_data, n_data == snp_to_int['G'], snp_to_int['GG'])
-    numpy.place(n_data, n_data == snp_to_int['I'], snp_to_int['II'])
-    numpy.place(n_data, n_data == snp_to_int['T'], snp_to_int['TT'])
+    np.place(n_data, n_data == snp_to_int['A'], snp_to_int['AA'])
+    np.place(n_data, n_data == snp_to_int['C'], snp_to_int['CC'])
+    np.place(n_data, n_data == snp_to_int['D'], snp_to_int['DD'])
+    np.place(n_data, n_data == snp_to_int['G'], snp_to_int['GG'])
+    np.place(n_data, n_data == snp_to_int['I'], snp_to_int['II'])
+    np.place(n_data, n_data == snp_to_int['T'], snp_to_int['TT'])
 
     # Step 3 : Change the feature's representation from categories to additive
     # coding.
@@ -84,14 +84,14 @@ def trim_dataset():
                     nb_occ = (snp[0] == major_allele) + (snp[1] == major_allele)
                 elif len(snp) == 1:
                     nb_occ = int(snp == major_allele)
-                numpy.place(tmp, n_data[:, i] == snp_to_int[snp], nb_occ)
+                np.place(tmp, n_data[:, i] == snp_to_int[snp], nb_occ)
         
         n_data[:, i] = tmp
     
     # Final step : Save the new dataset to disk
     print("Saving to disk")
     
-    numpy.save(os.path.join(path, 'ma_dataset_trimmed.npy'), n_data)
+    np.save(os.path.join(path, 'ma_dataset_trimmed.npy'), n_data)
     
 if __name__ == "__main__":
     trim_dataset(path=sys.argv[1])

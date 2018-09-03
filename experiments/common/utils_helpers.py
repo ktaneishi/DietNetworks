@@ -1,13 +1,13 @@
 from __future__ import print_function
 import os
 import numpy as np
-from DietNetworks.experiments.common import dataset_utils as du
+from DietNetworks.experiments.common.dataset_utils import load_1000_genomes
 import sys
 
 def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
                                feature_splits=None, fold=0, perclass=False):
 
-    train, valid, test, _ = du.load_1000_genomes(transpose=transpose,
+    train, valid, test, _ = load_1000_genomes(transpose=transpose,
                                                  label_splits=label_splits,
                                                  feature_splits=feature_splits,
                                                  fold=fold,
@@ -53,7 +53,7 @@ def generate_1000_genomes_bag_of_genes(
         path, transpose=False, label_splits=None,
         feature_splits=[0.8], fold=0):
 
-    train, valid, test, _ = du.load_1000_genomes(transpose, label_splits,
+    train, valid, test, _ = load_1000_genomes(transpose, label_splits,
                                                  feature_splits, fold,
                                                  norm=False)
 
@@ -80,7 +80,7 @@ def generate_1000_genomes_bag_of_genes(
 def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
                                   feature_splits=None, fold=0):
 
-    train, valid, test, _ = du.load_1000_genomes_old(transpose, label_splits,
+    train, valid, test, _ = load_1000_genomes(transpose, label_splits,
                                                      feature_splits, fold,
                                                      norm=False)
 
@@ -88,7 +88,6 @@ def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
     nolabel_orig = (np.vstack([train[0], valid[0]]))
     nolabel_x = np.zeros((nolabel_orig.shape[0], nolabel_orig.shape[1]*2),
                          dtype='uint8')
-
 
     filename = 'unsupervised_snp_bin_fold' + str(fold) + '.npy'
 
@@ -101,6 +100,6 @@ def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
 if __name__ == '__main__':
     path = sys.argv[1]
     for f in range(5):
-        print(str(f))
+        print(f)
         generate_1000_genomes_hist(path=path, transpose=False, label_splits=[.75],
                                    feature_splits=[1.], fold=f, perclass=True)

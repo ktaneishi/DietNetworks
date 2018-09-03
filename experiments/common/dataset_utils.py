@@ -1,11 +1,6 @@
 from __future__ import print_function
 import numpy as np
 import os
-"""
-from DietNetworks.experiments.common import (protein_loader, dorothea,
-                                                  reuters, imdb, iric_molecules,
-                                                  thousand_genomes)
-"""
 from DietNetworks.experiments.common import thousand_genomes
 from DietNetworks import aggregate_dataset as opensnp
 
@@ -30,7 +25,6 @@ def split(data_sources, splits):
     the first containing 60% of the data and the other containing the
     remaining 40%.
     """
-
     if splits is None:
         return data_sources
 

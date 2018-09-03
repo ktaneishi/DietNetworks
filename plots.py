@@ -46,7 +46,7 @@ all_colors = list(itertools.product(*colors))
 random.shuffle(all_colors)
 
 fold = 3
-path = '/data/lisatmp4/romerosa/feature_selection/subjects/histo3x26/fold' + str(fold)
+path = 'histo3x26/fold' + str(fold)
 layer = 0
 which_set = 'test'
 category = 'ethnicity'

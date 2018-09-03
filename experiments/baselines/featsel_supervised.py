@@ -26,7 +26,6 @@ from lasagne.nonlinearities import sigmoid, softmax
 
 sys.path.append('/data/lisatmp4/dejoieti/DietNetworks')
 
-
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     """Generate the minibatches for learning."""
 
@@ -43,12 +42,10 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
         yield inputs[excerpt], targets[excerpt]
 
-
 def onehot_labels(labels, min_val, max_val):
     output = np.zeros((len(labels), max_val - min_val + 1), dtype="int32")
     output[np.arange(len(labels)), labels - min_val] = 1
     return output
-
 
 def generate_test_predictions(minibatches, pred_fn):
 
@@ -99,7 +96,6 @@ def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
     return monitoring_dict
 
-
 # Main program
 def execute(samp_embedding_source, num_epochs=500,
             lr_value=1e-5, n_classes=1,
@@ -119,7 +115,6 @@ def execute(samp_embedding_source, num_epochs=500,
     of the data, you should provide the path of the npz file from save_path
     ('/data/lisatmp4/dejoieti/DietNetworks/')
     """
-
     # Load the dataset
     print("Loading data")
     f = np.load(os.path.join(save_path, samp_embedding_source))
@@ -319,7 +314,6 @@ def execute(samp_embedding_source, num_epochs=500,
     # with np.load('model.npz') as f:
     #     param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     # lasagne.layers.set_all_param_values(network, param_values)
-
 
 def main():
     """Run execute with the accurate arguments."""

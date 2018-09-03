@@ -4,15 +4,17 @@ import numpy as np
 from DietNetworks.experiments.common.dataset_utils import load_1000_genomes
 import sys
 
-def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
-                               feature_splits=None, fold=0, perclass=False):
+def generate_1000_genomes_hist(path, label_splits=None, feature_splits=None, fold=0, perclass=True):
 
-    train, valid, test, _ = load_1000_genomes(transpose=transpose,
-                                                 label_splits=label_splits,
-                                                 feature_splits=feature_splits,
-                                                 fold=fold,
-                                                 norm=False, nolabels='raw', path=path)
+    train, valid, test, _ = load_1000_genomes(path,
+                                                label_splits=label_splits,
+                                                feature_splits=feature_splits,
+                                                fold=fold, norm=False)
 
+    for data in [train, valid, test]:
+        X, y = data
+        print(X.shape, y.shape)
+            
     # Generate no_label: fuse train and valid sets
     nolabel_orig = (np.vstack([train[0], valid[0]])).transpose()
     nolabel_y = np.vstack([train[1], valid[1]])
@@ -20,7 +22,7 @@ def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
     nolabel_y = nolabel_y.argmax(axis=1)
 
     filename = 'histo3x26' if perclass else 'histo3'
-    filename += '_fold' + str(fold) + '.npy'
+    filename += '_fold%d.npy' % fold
 
     if perclass:
         # the first dimension of the following is length 'number of snps'
@@ -33,11 +35,6 @@ def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
                     np.bincount(nolabel_orig[i, nolabel_y == j ].astype('int32'), minlength=3)
                 nolabel_x[i, j*3:j*3+3] /= \
                     nolabel_x[i, j*3:j*3+3].sum()
-            # print nolabel_orig[0,:].shape
-            # print nolabel_orig[0,:].sum()
-            # print nolabel_y
-            # print zip(np.sum(nolabel_x[0,:].reshape(26,3), axis=1), np.bincount(nolabel_y.astype('int32')))
-            # print nolabel_x[0,:].reshape(26,3)
     else:
         nolabel_x = np.zeros((nolabel_orig.shape[0], 3))
         for i in range(nolabel_x.shape[0]):
@@ -49,13 +46,9 @@ def generate_1000_genomes_hist(path, transpose=False, label_splits=None,
 
     np.save(os.path.join(path, filename), nolabel_x)
 
-def generate_1000_genomes_bag_of_genes(
-        path, transpose=False, label_splits=None,
-        feature_splits=[0.8], fold=0):
+def generate_1000_genomes_bag_of_genes(path, label_splits=None, feature_splits=[0.8], fold=0):
 
-    train, valid, test, _ = load_1000_genomes(transpose, label_splits,
-                                                 feature_splits, fold,
-                                                 norm=False)
+    train, valid, test, _ = load_1000_genomes(label_splits, feature_splits, fold, norm=False)
 
     nolabel_orig = (np.vstack([train[0], valid[0]]))
 
@@ -77,12 +70,9 @@ def generate_1000_genomes_bag_of_genes(
     nolabel_x[mod1] += 1
     nolabel_x[mod2] += 1
 
-def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
-                                  feature_splits=None, fold=0):
+def generate_1000_genomes_snp2bin(path, label_splits=None, feature_splits=None, fold=0):
 
-    train, valid, test, _ = load_1000_genomes(transpose, label_splits,
-                                                     feature_splits, fold,
-                                                     norm=False)
+    train, valid, test, _ = load_1000_genomes(label_splits, feature_splits, fold, norm=False)
 
     # Generate no_label: fuse train and valid sets
     nolabel_orig = (np.vstack([train[0], valid[0]]))
@@ -98,8 +88,9 @@ def generate_1000_genomes_snp2bin(path, transpose=False, label_splits=None,
     np.save(os.path.join(path, filename), nolabel_x)
 
 if __name__ == '__main__':
+    nfold = 5
     path = sys.argv[1]
-    for f in range(5):
-        print(f)
-        generate_1000_genomes_hist(path=path, transpose=False, label_splits=[.75],
-                                   feature_splits=[1.], fold=f, perclass=True)
+
+    for fold in range(nfold):
+        print(fold)
+        generate_1000_genomes_hist(path=path, label_splits=[.75], feature_splits=[1.], fold=fold)

@@ -2,7 +2,6 @@ from __future__ import print_function
 import numpy as np
 import os
 from DietNetworks.experiments.common import thousand_genomes
-from DietNetworks import aggregate_dataset as opensnp
 
 def shuffle(data_sources, seed=23):
     """
@@ -61,7 +60,6 @@ def prune_splits(splits, nb_prune):
 def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=None,
                       nolabels='raw', fold=0, norm=True):
 
-    # user = os.getenv("USER")
     print(path)
 
     if nolabels == 'raw' or not transpose:

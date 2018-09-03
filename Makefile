@@ -26,10 +26,10 @@ $(TMPDIR)/histo3x26_fold0.npy: $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_au
 	PYTHONPATH=../ python experiments/common/utils_helpers.py $(TMPDIR)/
 
 run:
-	PYTHONPATH=../ python experiments/variant2/learn_model.py --which_fold=0 -eni=0.02 -dni=0.02 -ne=1000 \
+	PYTHONPATH=../ python experiments/variant2/learn_model.py -eni=0.02 -dni=0.02 -ne=1000 \
 		--n_hidden_t_enc=[100,100] --n_hidden_t_dec=[100,100] --n_hidden_s=[100] --n_hidden_u=[100] \
-		--gamma=0 --learning_rate=0.00003 -lra=.999 --patience=500 --optimizer=adam -bn=1 \
-		--embedding_source=histo3x26 -exp_name=dietnet_histo_ -rp=0 \
+		--gamma=0 --learning_rate=0.00003 --patience=500 --optimizer=adam -bn=1 \
+		--embedding_source=histo3x26 -exp_name=dietnet_histo_ \
 		--dataset_path=$(TMPDIR)/ --save_perm=out/ --save_tmp=tmp/
 
 clean:

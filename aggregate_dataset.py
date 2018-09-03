@@ -211,7 +211,7 @@ if __name__ == "__main__":
         else:
             return float(s)
 
-    height = np.genfromtxt('/data/lisatmp4/dejoieti/height.csv', dtype=None, delimiter="\t")
+    height = np.genfromtxt('height.csv', dtype=None, delimiter="\t")
     height = height[1:, :]
     height[:, 1] = map(map_to_float, height[:, 1])
     height = height.astype(float)  # from str to float
@@ -224,7 +224,7 @@ if __name__ == "__main__":
     # users_id_w_height_str = ['user'+str(el) for el in users_id_w_height]
 
     # constructing dataset
-    data_dir = "/data/lisatmp4/sylvaint/data/openSNP"
+    data_dir = "openSNP"
     files = list_files(data_dir)
 
     # print (type(files))
@@ -297,5 +297,5 @@ if __name__ == "__main__":
             arr[user_idx, feature_idx] = feature_value
     arr_height = arr_height.squeeze()
     # Save the result to disk
-    np.save("/data/lisatmp4/erraqabi/ma_dataset.npy", arr)
-    np.save("/data/lisatmp4/erraqabi/height_ma_dataset.npy", arr_height)
+    np.save("ma_dataset.npy", arr)
+    np.save("height_ma_dataset.npy", arr_height)

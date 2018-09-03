@@ -16,21 +16,16 @@ import model_helpers as mh
 
 print ("config floatX: {}".format(config.floatX))
 
-import getpass
-CLUSTER = getpass.getuser() in ["tisu32"]
-
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             embedding_source=None,
-            num_epochs=500, learning_rate=.001, learning_rate_annealing=1.0,
+            num_epochs=500, learning_rate=.001, learning_rate_annealing=0.999,
             alpha=1, beta=1, gamma=1, lmd=.0001, disc_nonlinearity="sigmoid",
             encoder_net_init=0.2, decoder_net_init=0.2, optimizer="rmsprop",
             max_patience=100, batchnorm=0, keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
             early_stop_criterion='loss_sup_det',
-            save_path='./',
-            save_copy='./',
-            dataset_path='./',
+            save_path='./', save_copy='./', dataset_path='./',
             resume=False, exp_name='', random_proj=0):
 
     # Prepare embedding information
@@ -524,12 +519,10 @@ def main():
                         default='accuracy',
                         help='What monitored variable to use for early-stopping')
     parser.add_argument('--save_tmp',
-                        default= '/Tmp/'+ os.environ["USER"]+'/DietNetworks/' if not CLUSTER else
-                            '$SCRATCH'+'/DietNetworks/',
+                        default= './',
                         help='Path to save results.')
     parser.add_argument('--save_perm',
-                        default='/data/lisatmp4/'+ os.environ["USER"]+'/DietNetworks/' if not CLUSTER else
-                            '$SCRATCH'+'/DietNetworks/',
+                        default='./',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
                         default='./',

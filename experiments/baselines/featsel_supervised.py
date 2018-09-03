@@ -7,7 +7,6 @@ For getting an embedding of the features, see for instance
 featsel_unsupervised.py
 For getting an embedding of the data, see for instance
 benchmark/pca.py or benchmark/kmeans.py
-
 """
 from __future__ import print_function
 
@@ -23,8 +22,6 @@ import theano
 import theano.tensor as T
 
 from lasagne.nonlinearities import sigmoid, softmax
-
-sys.path.append('/data/lisatmp4/dejoieti/DietNetworks')
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     """Generate the minibatches for learning."""
@@ -56,12 +53,10 @@ def generate_test_predictions(minibatches, pred_fn):
         inputs, _ = batch
 
         probs = pred_fn(inputs)
-        all_probabilities = np.concatenate((all_probabilities, probs[:, 1]),
-                                           axis=0)
+        all_probabilities = np.concatenate((all_probabilities, probs[:, 1]), axis=0)
 
         predictions = probs.argmax(axis=1)
-        all_predictions = np.concatenate((all_predictions, predictions),
-                                         axis=0)
+        all_predictions = np.concatenate((all_predictions, predictions), axis=0)
 
     # Write the predictions to a text file
     filename_pred = "test_preds_" + time.strftime("%Y-%M-%d_%T") + ".txt"
@@ -72,7 +67,6 @@ def generate_test_predictions(minibatches, pred_fn):
     filename_prob = "test_probs_" + time.strftime("%Y-%M-%d_%T") + ".txt"
     with open(filename_prob, "w") as f:
         f.write(",".join([str(p) for p in all_probabilities]))
-
 
 def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
@@ -163,13 +157,6 @@ def execute(samp_embedding_source, num_epochs=500,
     updates = lasagne.updates.rmsprop(loss,
                                       params,
                                       learning_rate=lr)
-    # updates = lasagne.updates.sgd(loss,
-    #                               params,
-    #                               learning_rate=lr)
-    # updates = lasagne.updates.momentum(loss, params,
-    #                                    learning_rate=lr, momentum=0.0)
-    # updates[lr] = T.max((lr * .99).astype('float32'), 1e-6)
-    # updates[lr] = (lr * 1.0).astype('float32')
 
     train_fn = theano.function([input_var, target_var], loss, updates=updates)
 
@@ -344,7 +331,6 @@ def main():
 
     execute(args.dataset, args.feat_embedding_source,
             args.sample_embedding_source, int(args.num_epochs))
-
 
 if __name__ == '__main__':
     main()

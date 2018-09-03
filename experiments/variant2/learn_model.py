@@ -8,13 +8,10 @@ import lasagne
 from lasagne.regularization import apply_penalty, l2
 import numpy as np
 import theano
-from theano import config
 import theano.tensor as T
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
-print ("config floatX: {}".format(config.floatX))
 
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,

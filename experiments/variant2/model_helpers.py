@@ -15,7 +15,6 @@ from theano.tensor.shared_randomstreams import RandomStreams
 
 _EPSILON = 10e-8
 
-
 def build_feat_emb_nets(embedding_source, n_feats, n_samples_unsup,
                         input_var_unsup, n_hidden_u, n_hidden_t_enc,
                         n_hidden_t_dec, gamma, encoder_net_init,
@@ -50,7 +49,6 @@ def build_feat_emb_nets(embedding_source, n_feats, n_samples_unsup,
             # stds = feat_emb_val.std(1)
             # feat_emb_val  = feat_emb_val-means[:, None]
             # feat_emb_val /= stds[:, None]
-
 
         feat_emb = theano.shared(feat_emb_val, 'feat_emb')
         encoder_net = InputLayer((n_feats, feat_emb_val.shape[1]), feat_emb)
@@ -91,7 +89,6 @@ def build_feat_emb_nets(embedding_source, n_feats, n_samples_unsup,
 
     return [nets, embeddings, pred_feat_emb if not embedding_source else []]
 
-
 def build_feat_emb_reconst_nets(coeffs, n_feats, n_hidden_u,
                                 n_hidden_t, enc_nets, net_inits):
 
@@ -116,7 +113,6 @@ def build_feat_emb_reconst_nets(coeffs, n_feats, n_hidden_u,
         nets += [W_net]
 
     return nets
-
 
 def build_discrim_net(batch_size, n_feats, input_var_sup, n_hidden_t_enc,
                       n_hidden_s, embedding, disc_nonlinearity, n_targets,
@@ -156,7 +152,6 @@ def build_discrim_net(batch_size, n_feats, input_var_sup, n_hidden_t_enc,
                                                      cont_labels)
     return discrim_net, hidden_rep
 
-
 def build_reconst_net(hidden_rep, embedding, n_feats, gamma):
     # Reconstruct the input using dec_feat_emb
     if gamma > 0:
@@ -166,7 +161,6 @@ def build_reconst_net(hidden_rep, embedding, n_feats, gamma):
         reconst_net = None
 
     return reconst_net
-
 
 def define_predictions(nets, start=0):
     preds = []
@@ -182,7 +176,6 @@ def define_predictions(nets, start=0):
                                                     deterministic=True)]
 
     return preds, preds_det
-
 
 def define_reconst_losses(preds, preds_det, input_vars_list):
     reconst_losses = []
@@ -200,7 +193,6 @@ def define_reconst_losses(preds, preds_det, input_vars_list):
 
     return reconst_losses, reconst_losses_det
 
-
 def define_loss(pred, pred_det, target_var, output_type):
 
     if output_type == 'raw' or output_type == 'w2v':  # loss is MSE
@@ -217,7 +209,6 @@ def define_loss(pred, pred_det, target_var, output_type):
 
     return loss, loss_det
 
-
 def crossentropy(y_pred, y_true):
     # Clip probs
     y_pred = T.clip(y_pred, _EPSILON, 1.0 - _EPSILON)
@@ -227,7 +218,6 @@ def crossentropy(y_pred, y_true):
     loss = T.nnet.categorical_crossentropy(y_pred, y_true)
 
     return loss
-
 
 def define_sup_loss(disc_nonlinearity, prediction, prediction_det, keep_labels,
                     target_var_sup, missing_labels_val):
@@ -269,7 +259,6 @@ def define_sup_loss(disc_nonlinearity, prediction, prediction_det, keep_labels,
 
     return loss_sup, loss_sup_det
 
-
 def define_test_functions(disc_nonlinearity, prediction, prediction_det,
                            target_var_sup):
     if disc_nonlinearity in ["sigmoid", "softmax", "softmax_hierarchy"]:
@@ -283,7 +272,6 @@ def define_test_functions(disc_nonlinearity, prediction, prediction_det,
             test_acc = T.mean(T.eq(test_pred, target_var_sup.argmax(1)),
                               dtype=theano.config.floatX) * 100
         return test_acc, test_pred
-
 
 def create_1000_genomes_continent_labels():
     labels = ['ACB', 'ASW', 'BEB', 'CDX', 'CEU', 'CHB', 'CHS', 'CLM', 'ESN',
@@ -346,7 +334,6 @@ class HierarchicalSoftmax(object):
 
         return softmax_hierarchy
 
-
 class HierarchicalMergeSoftmaxLayer(MergeLayer):
     """
     This layer performs an elementwise merge of its input layers.
@@ -387,7 +374,6 @@ class HierarchicalMergeSoftmaxLayer(MergeLayer):
 
         return output
 
-
 def define_sampled_mean_bincrossentropy(y_pred, x, gamma=.5, one_ratio=.25,
                                         random_stream=RandomStreams(seed=1)):
 
@@ -410,7 +396,6 @@ def define_sampled_mean_bincrossentropy(y_pred, x, gamma=.5, one_ratio=.25,
 
     return cost
 
-
 def dice_coef(y_true, y_pred):
     smooth = 1.0
     y_true_f = T.flatten(y_true)
@@ -418,10 +403,8 @@ def dice_coef(y_true, y_pred):
     intersection = T.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (T.sum(y_true_f) + T.sum(y_pred_f) + smooth)
 
-
 def dice_coef_loss(y_true, y_pred):
     return -dice_coef(y_true, y_pred)
-
 
 def freezeParameters(net, single=True):
     all_layers = lasagne.layers.get_all_layers(net)
@@ -436,7 +419,6 @@ def freezeParameters(net, single=True):
                 layer.params[p].remove('trainable')
             except KeyError:
                 pass
-
 
 def rectify_minus2(x):
     """Rectify activation function :math:`\\varphi(x) = \\max(0, x)`

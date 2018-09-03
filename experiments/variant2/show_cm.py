@@ -6,7 +6,6 @@ from getpass import getuser
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-
 def plot(dataset,
          metric='loss',
          model_path=None,
@@ -77,7 +76,6 @@ def plot(dataset,
     plt.show()
     fig.savefig('cm_eth26.png', dpi=fig.dpi)
 
-
     #
     # CM continents
     #
@@ -117,12 +115,6 @@ def plot(dataset,
     plt.show()
     fig.savefig('cm_cont5.png', dpi=fig.dpi)
 
-
-
-
-
-
-
 def main():
     parser = argparse.ArgumentParser(description='Conf. mat.')
     parser.add_argument('-dataset',
@@ -154,7 +146,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 # ['CHB', 'JPT', 'CHS', 'CDX', 'KHV', 'CEU', 'TSI', 'FIN', 'GBR', 'IBS', 'YRI', 'LWK', 'GWD', 'MSL', 'ESN', 'ASW', 'ACB', 'MXL', 'PUR', 'CLM', 'PEL', 'GIH', 'PJL', 'BEB', 'STU', 'ITU']
 # ['ACB', 'ASW', 'BEB', 'CDX', 'CEU', 'CHB', 'CHS', 'CLM', 'ESN', 'FIN', 'GBR', 'GIH', 'GWD', 'IBS', 'ITU', 'JPT', 'KHV', 'LWK', 'MSL', 'MXL', 'PEL', 'PJL', 'PUR', 'STU', 'TSI', 'YRI']

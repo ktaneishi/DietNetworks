@@ -256,15 +256,11 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Pre-training monitoring
     print("Epoch 0 of {}".format(num_epochs))
 
-    train_minibatches = mlh.iterate_minibatches(x_train, y_train,
-                                                batch_size, shuffle=False)
-    train_err = mlh.monitoring(train_minibatches, "train", val_fn,
-                               monitor_labels, prec_recall_cutoff)
+    train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
+    train_err = mlh.monitoring(train_minibatches, "train", val_fn, monitor_labels, prec_recall_cutoff)
 
-    valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
-                                                batch_size, shuffle=False)
-    valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
-                               monitor_labels, prec_recall_cutoff)
+    valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
+    valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn, monitor_labels, prec_recall_cutoff)
 
     # Training loop
     start_training = time.time()
@@ -276,8 +272,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
         # Train pass
         for batch in mlh.iterate_minibatches(x_train, training_labels,
-                                             batch_size,
-                                             shuffle=True):
+                                             batch_size, shuffle=True):
             loss_epoch += train_fn(*batch)
             nb_minibatches += 1
 
@@ -329,9 +324,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             # Monitor on the test set now because sometimes the saving doesn't
             # go well and there isn't a model to load at the end of training
             if y_test is not None:
-                test_minibatches = mlh.iterate_minibatches(x_test, y_test,
-                                                           138,
-                                                           shuffle=False)
+                test_minibatches = mlh.iterate_minibatches(x_test, y_test, 138, shuffle=False)
 
                 test_err = mlh.monitoring(test_minibatches, "test", val_fn,
                                           monitor_labels, prec_recall_cutoff)
@@ -339,8 +332,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             patience += 1
             # Save stuff
             np.savez(os.path.join(save_path, 'dietnet_last.npz'),
-                     *lasagne.layers.get_all_param_values(list(filter(None, nets)) +
-                                                          [discrim_net]))
+                     *lasagne.layers.get_all_param_values(list(filter(None, nets)) + [discrim_net]))
             np.savez(save_path + "/errors_supervised_last.npz",
                      zip(*train_monitored), zip(*valid_monitored))
 
@@ -359,35 +351,26 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             if embedding_source is None:
                 # Save embedding
                 pred = pred_feat_emb()
-                np.savez(os.path.join(save_path, 'feature_embedding.npz'),
-                         pred)
+                np.savez(os.path.join(save_path, 'feature_embedding.npz'), pred)
 
             # Training set results
-            train_minibatches = mlh.iterate_minibatches(x_train, y_train,
-                                                        batch_size,
-                                                        shuffle=False)
+            train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
             train_err = mlh.monitoring(train_minibatches, "train", val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Validation set results
-            valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
-                                                        batch_size,
-                                                        shuffle=False)
+            valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
             valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Test set results
             if y_test is not None:
-                test_minibatches = mlh.iterate_minibatches(x_test, y_test,
-                                                           138,
-                                                           shuffle=False)
+                test_minibatches = mlh.iterate_minibatches(x_test, y_test, 138, shuffle=False)
 
                 test_err = mlh.monitoring(test_minibatches, "test", val_fn,
                                           monitor_labels, prec_recall_cutoff)
             else:
-                for minibatch in mlh.iterate_testbatches(x_test,
-                                                         138,
-                                                         shuffle=False):
+                for minibatch in mlh.iterate_testbatches(x_test, 138, shuffle=False):
                     test_predictions = []
                     test_predictions += [predict(minibatch)]
                 np.savez(os.path.join(save_path, 'test_predictions.npz'),

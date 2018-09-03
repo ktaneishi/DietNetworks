@@ -3,11 +3,8 @@ import os
 import numpy as np
 
 import lasagne
-from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, BatchNormLayer, \
-    MergeLayer, Layer
-from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify,
-                                    leaky_rectify, very_leaky_rectify)
-from lasagne.regularization import apply_penalty, l2, l1
+from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, BatchNormLayer, MergeLayer, Layer
+from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify, leaky_rectify, very_leaky_rectify)
 from lasagne.init import Uniform
 import theano
 import theano.tensor as T

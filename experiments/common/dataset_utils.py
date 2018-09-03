@@ -57,8 +57,7 @@ def prune_splits(splits, nb_prune):
         normalization_constant = 1.0 / sum(splits)
     return [s * normalization_constant for s in splits[:-nb_prune]]
 
-def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=None,
-                      nolabels='raw', fold=0, norm=True):
+def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=None, nolabels='raw', fold=0, norm=True):
 
     print(path)
 
@@ -102,14 +101,11 @@ def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=N
     elif nolabels == 'raw' and transpose:
         unsupervised_data = x.transpose()
     elif nolabels == 'histo3':
-        unsupervised_data = np.load(os.path.join(path, 'histo3_fold' +
-                                    str(fold) + '.npy'))
+        unsupervised_data = np.load(os.path.join(path, 'histo3_fold%d.npy' % fold))
     elif nolabels == 'histo3x26':
-        unsupervised_data = np.load(os.path.join(path, 'histo3x26_fold' +
-                                    str(fold) + '.npy'))
+        unsupervised_data = np.load(os.path.join(path, 'histo3x26_fold%d.npy' % fold))
     elif nolabels == 'bin':
-        unsupervised_data = np.load(os.path.join(path, 'snp_bin_fold' +
-                                        str(fold) + '.npy'))
+        unsupervised_data = np.load(os.path.join(path, 'snp_bin_fold%d.npy' % fold))
     elif nolabels == 'w2v':
         raise NotImplementedError
     else:

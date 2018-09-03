@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-
 from __future__ import print_function
 import argparse
 import time
@@ -8,20 +6,15 @@ import tables
 from distutils.dir_util import copy_tree
 
 import lasagne
-from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, ReshapeLayer, \
-    NonlinearityLayer
+from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, ReshapeLayer, NonlinearityLayer
 from lasagne.nonlinearities import sigmoid, softmax, tanh, linear, rectify
 from lasagne.regularization import apply_penalty, l2, l1
-from lasagne.init import Uniform
 import numpy as np
 import theano
 import theano.tensor as T
 
-from DietNetworks.experiments.common import dataset_utils
-
 import mainloop_helpers as mlh
 import model_helpers as mh
-
 
 # Main program
 def execute(dataset, n_hidden_u, num_epochs=500,
@@ -130,11 +123,6 @@ def execute(dataset, n_hidden_u, num_epochs=500,
     updates = lasagne.updates.adam(loss,
                                    params,
                                    learning_rate=lr)
-    # updates = lasagne.updates.sgd(loss,
-    #                              params,
-    #                              learning_rate=lr)
-    # updates = lasagne.updates.momentum(loss, params,
-    #                                    learning_rate=lr, momentum=0.0)
 
     # Apply norm constraints on the weights
     for k in updates.keys():
@@ -162,7 +150,6 @@ def execute(dataset, n_hidden_u, num_epochs=500,
 
     pred_feat_emb = theano.function([input_var], predictions_det[0])
 
-
     # Finally, launch the training loop.
     print("Starting training...")
 
@@ -184,22 +171,19 @@ def execute(dataset, n_hidden_u, num_epochs=500,
         loss_epoch = 0
 
         # Train pass
-        for batch in mlh.iterate_minibatches_unsup(x_train, batch_size,
-                                                   shuffle=True):
+        for batch in mlh.iterate_minibatches_unsup(x_train, batch_size, shuffle=True):
             loss_epoch += train_fn(batch)
 
         loss_epoch /= nb_minibatches
         train_loss += [loss_epoch]
 
-        train_minibatches = mlh.iterate_minibatches_unsup(x_train, batch_size,
-                                                          shuffle=True)
+        train_minibatches = mlh.iterate_minibatches_unsup(x_train, batch_size, shuffle=True)
         train_err = mlh.monitoring(train_minibatches, "train", val_fn,
                                    monitor_labels, start=0)
         train_monitored += [train_err]
 
         # Validation pass
-        valid_minibatches = mlh.iterate_minibatches_unsup(x_valid, batch_size,
-                                                          shuffle=True)
+        valid_minibatches = mlh.iterate_minibatches_unsup(x_valid, batch_size, shuffle=True)
 
         valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
                                    monitor_labels, start=0)
@@ -278,7 +262,6 @@ def execute(dataset, n_hidden_u, num_epochs=500,
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
 
-
 def main():
     parser = argparse.ArgumentParser(description="""Learn feature embedding.""")
     parser.add_argument('--dataset',
@@ -326,7 +309,6 @@ def main():
                         default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/',
                         help='Path to dataset')
 
-
     args = parser.parse_args()
 
     execute(args.dataset,
@@ -340,7 +322,6 @@ def main():
             args.save_tmp,
             args.save_perm,
             args.dataset_path)
-
 
 if __name__ == '__main__':
     main()

@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-
 from __future__ import print_function
 import argparse
 import time
@@ -21,10 +19,6 @@ from DietNetworks.experiments.common import dataset_utils
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
-import getpass
-CLUSTER = getpass.getuser() in ["tisu32"]
-
 
 # Main program
 def execute(dataset, n_hidden_t_enc, n_hidden_s,
@@ -131,11 +125,6 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     updates = lasagne.updates.rmsprop(loss,
                                       params,
                                       learning_rate=lr)
-    # updates = lasagne.updates.sgd(loss,
-    #                               params,
-    #                               learning_rate=lr)
-    # updates = lasagne.updates.momentum(loss, params,
-    #                                    learning_rate=lr, momentum=0.0)
 
     # Apply norm constraints on the weights
     for k in updates.keys():
@@ -322,7 +311,6 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
 
-
 def main():
     parser = argparse.ArgumentParser(description="""Train basic model""")
     parser.add_argument('--dataset',
@@ -379,8 +367,7 @@ def main():
                         default='accuracy',
                         help='What monitored variable to use for early-stopping')
     parser.add_argument('--save_tmp',
-                        default= '/Tmp/'+ os.environ["USER"]+'/DietNetworks/' if not CLUSTER else
-                            '$SCRATCH'+'/DietNetworks/',
+                        default= './',
                         help='Path to save results.')
     parser.add_argument('--save_perm',
                         default='/data/lisatmp4/'+ os.environ["USER"]+'/DietNetworks/',
@@ -414,7 +401,6 @@ def main():
             args.save_perm,
             args.dataset_path,
             args.resume)
-
 
 if __name__ == '__main__':
     main()

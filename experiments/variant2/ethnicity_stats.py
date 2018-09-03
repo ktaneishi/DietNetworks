@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-
 from __future__ import print_function
 import os
 import argparse
@@ -8,23 +6,19 @@ import matplotlib.pyplot as plt
 
 from DietNetworks.experiments.common import dataset_utils
 
-
-def execute(dataset,
-            dataset_path='/Tmp/' + os.environ["USER"] + '/datasets/'):
+def execute(dataset, dataset_path='./'):
 
     # Load the dataset
     print("Loading data")
     splits = [0.75]  # This will split the data into [60%, 20%, 20%]
 
     if dataset == '1000_genomes':
-        data = dataset_utils.load_1000_genomes(transpose=False,
-                                               label_splits=splits)
+        data = dataset_utils.load_1000_genomes(transpose=False, label_splits=splits)
     else:
         print("Unknown dataset")
         return
 
-    (x_train, y_train), (x_valid, y_valid), (x_test, y_test),\
-        x_nolabel = data
+    (x_train, y_train), (x_valid, y_valid), (x_test, y_test), x_nolabel = data
 
     y_train = y_train.argmax(1)
     y_valid = y_valid.argmax(1)
@@ -42,7 +36,6 @@ def execute(dataset,
 
         eth_tot[i] = eth_train[i] + eth_valid[i] + eth_test[i]
 
-
 def main():
     parser = argparse.ArgumentParser(description="""Compute ethnicity stats""")
     parser.add_argument('--dataset',
@@ -56,9 +49,7 @@ def main():
     print ("Printing args")
     print (args)
 
-    execute(args.dataset,
-            args.dataset_path)
-
+    execute(args.dataset, args.dataset_path)
 
 if __name__ == '__main__':
     main()

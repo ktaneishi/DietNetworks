@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# from __future__ import print_function
 import argparse
 import time
 import os
@@ -7,32 +5,16 @@ from distutils.dir_util import copy_tree
 
 import lasagne
 from lasagne.layers import DenseLayer, InputLayer
-from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify,
-                                    leaky_rectify, very_leaky_rectify)
+from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify, leaky_rectify, very_leaky_rectify)
 from lasagne.regularization import apply_penalty, l2, l1
-from lasagne.init import (Uniform, GlorotUniform, GlorotNormal, Normal, He,
-                          HeNormal, HeUniform)
+from lasagne.init import (Uniform, GlorotUniform, GlorotNormal, Normal, He, HeNormal, HeUniform)
 import numpy as np
 import theano
-from theano import config
 import theano.tensor as T
 
 import mainloop_helpers as mlh
 import model_helpers as mh
 from mainloop_helpers import parse_string_int_tuple
-
-import random
-import getpass
-
-import json
-
-# import ipdb
-print ("config floatX: {}".format(config.floatX))
-
-username = getpass.getuser()
-if username == "sylvaint" and not os.path.isdir("/Tmp/sylvaint"):
-    os.makedirs("/Tmp/sylvaint")
-
 
 # creating data generator
 def data_generator(dataset, batch_size, shuffle=False, noise=0.5):
@@ -59,7 +41,6 @@ def data_generator(dataset, batch_size, shuffle=False, noise=0.5):
 
         yield inputs, reconstruction_targets
 
-
 def convert_initialization(component, nonlinearity="sigmoid"):
     # component = init_dic[component_key]
     assert(len(component) == 2)
@@ -79,7 +60,6 @@ def convert_initialization(component, nonlinearity="sigmoid"):
         return Normal(*component[1])
     else:
         raise NotImplementedError()
-
 
 def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
             lmd=0., noise=0.0, encoder_units=[1024, 512, 256],
@@ -356,12 +336,10 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
         # Anneal the learning rate
         lr.set_value(float(lr.get_value() * learning_rate_annealing))
 
-
     # Copy files to loadpath
     if save_path != save_copy:
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
-
 
 def main():
     parser = argparse.ArgumentParser(description="""Train snp2vec embedding.""")
@@ -443,8 +421,6 @@ def main():
 
     args = parser.parse_args()
 
-    # import ipdb; ipdb.set_trace()
-
     init_args = {"encoder_init" : parse_string_int_tuple(args.encoder_init),
                  "decoder_init" : parse_string_int_tuple(args.decoder_init),
                  "predictor_init" : parse_string_int_tuple(args.predictor_init)}
@@ -468,7 +444,6 @@ def main():
             args.num_fully_connected,
             args.exp_name,
             init_args)
-
 
 if __name__ == '__main__':
     main()

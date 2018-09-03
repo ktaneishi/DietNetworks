@@ -1,5 +1,5 @@
 import pickle
-import numpy
+import numpy as np
 import os
 
 def load_data(path, force_pkl_recreation=False):
@@ -22,7 +22,7 @@ def load_data(path, force_pkl_recreation=False):
     headers = [l.split()[:6] for l in lines]
     
     nb_features = len(lines[-1].split()[6:])
-    genomic_data = numpy.empty((len(lines), nb_features), dtype="int8")
+    genomic_data = np.empty((len(lines), nb_features), dtype="int8")
     for idx, line in enumerate(lines):
         if idx % 100 == 0:
             print("Parsing subject %i out of %i" % (idx, len(lines)))
@@ -39,8 +39,8 @@ def load_data(path, force_pkl_recreation=False):
     all_labels = list(set(label_dict.values()))
     all_labels.sort()
     
-    label_data = numpy.zeros((genomic_data.shape[0], len(all_labels)),
-                             dtype="float32")
+    label_data = np.zeros((genomic_data.shape[0], len(all_labels)), dtype="float32")
+
     for subject_idx in range(len(headers)):
         subject_id = headers[subject_idx][0]
         subject_label = label_dict[subject_id]

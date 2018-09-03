@@ -1,5 +1,3 @@
-#!/usr/bin/env python2
-
 from __future__ import print_function
 import argparse
 import time
@@ -9,8 +7,7 @@ from distutils.dir_util import copy_tree
 
 import lasagne
 from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, BatchNormLayer
-from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify,
-                                    leaky_rectify, very_leaky_rectify)
+from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify, leaky_rectify, very_leaky_rectify)
 from lasagne.regularization import apply_penalty, l2
 
 import numpy as np
@@ -21,10 +18,6 @@ from DietNetworks.experiments.common import dataset_utils
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
-import getpass
-CLUSTER = getpass.getuser() in ["tisu32"]
-
 
 # Main program
 def execute(dataset, n_hidden_t_enc, n_hidden_s,
@@ -66,7 +59,6 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     print(save_path)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
 
     # Prepare Theano variables for inputs and targets
     input_var_sup = T.matrix('input_sup')
@@ -287,7 +279,6 @@ def main():
             args.save_path,
             args.resume,
             args.exp_name)
-
 
 if __name__ == '__main__':
     main()

@@ -265,6 +265,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Training loop
     start_training = time.time()
     for epoch in range(num_epochs):
+        print(epoch, patience)
         start_time = time.time()
         print("Epoch {} of {}".format(epoch+1, num_epochs))
         nb_minibatches = 0
@@ -280,23 +281,18 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         train_loss += [loss_epoch]
 
         # Monitoring on the training set
-        train_minibatches = mlh.iterate_minibatches(x_train, y_train,
-                                                    batch_size, shuffle=False)
-        train_err = mlh.monitoring(train_minibatches, "train", val_fn,
-                                   monitor_labels, prec_recall_cutoff)
+        train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
+        train_err = mlh.monitoring(train_minibatches, "train", val_fn, monitor_labels, prec_recall_cutoff)
         train_monitored += [train_err]
 
         # Monitoring on the validation set
-        valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
-                                                    batch_size, shuffle=False)
+        valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
 
-        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
-                                   monitor_labels, prec_recall_cutoff)
+        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn, monitor_labels, prec_recall_cutoff)
         valid_monitored += [valid_err]
 
         try:
-            early_stop_val = valid_err[
-                monitor_labels.index(early_stop_criterion)]
+            early_stop_val = valid_err[monitor_labels.index(early_stop_criterion)]
         except:
             raise ValueError("There is no monitored value by the name of %s" %
                              early_stop_criterion)

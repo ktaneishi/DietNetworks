@@ -1,19 +1,20 @@
-import pickle
 import numpy as np
 import os
 
-def load_data(path, force_pkl_recreation=False):
+def load_data(path, force_npz_recreation=False):
 
-    dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_dataset.pkl"
+    dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_dataset.npz"
     genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_A.raw"
     label_file = "../data/affy_samples.20141118.panel"
     
-    if os.path.exists(path + dataset_file) and not force_pkl_recreation:
+    if os.path.exists(path + dataset_file) and not force_npz_recreation:
         with open(path + dataset_file, "rb") as f:
-            genomic_data, label_data = pickle.load(f)
+            data = np.load(path + dataset_file)
+            genomic_data = data['genomic']
+            label_data = data['label']
             return genomic_data, label_data
         
-    print("No binary .pkl file has been found for this dataset. The data will "
+    print("No binary .npz file has been found for this dataset. The data will "
           "be parsed to produce one. This will take a few minutes.")
     
     # Load the genomic data file
@@ -50,12 +51,12 @@ def load_data(path, force_pkl_recreation=False):
     # Save the parsed data to the filesystem
     print("Saving parsed data to a binary format for faster loading in the future.")
     with open(path + dataset_file, "wb") as f:
-        pickle.dump((genomic_data, label_data), f, pickle.HIGHEST_PROTOCOL)
+        np.savez(path + dataset_file, genomic=genomic_data, label=label_data)
 
     return genomic_data, label_data
 
 if __name__ == '__main__':
-    x = load_data(force_pkl_recreation=True)
+    x = load_data(force_npz_recreation=True)
     print("Load1 done")
     x = load_data()
     print("Load2 done")

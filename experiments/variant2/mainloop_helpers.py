@@ -16,8 +16,7 @@ def load_data(dataset, dataset_path, embedding_source,
         # this corresponds to the split 60/20 of the whole data,
         # test is considered elsewhere as an extra 20% of the whole data
         splits = [.75]
-        data = load_1000_genomes(transpose=transpose,
-                                    label_splits=splits,
+        data = load_1000_genomes(transpose=transpose, label_splits=splits,
                                     feature_splits=[.8],
                                     fold=which_fold,
                                     nolabels=embedding_input,

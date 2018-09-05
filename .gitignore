@@ -1,21 +1,11 @@
-# skfeature
-skfeature
-
-*.pyc
-slurm*
-
-imdb/*
-
-# saved models and results
-feature_selection/1000_genomes*
-learn_gene_vector_*
-shuffle*
-
-# cluster logs
-LOGS/*
+# cache files
+__pycache__
 
 # temporary files
-tmp
+temp
+
+# log files
+log
 
 # data files
 data

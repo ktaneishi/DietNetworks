@@ -29,7 +29,7 @@ Experiments with reconstruction loss:
 
 THEANO_FLAGS='device=gpu' python learn_model.py --which_fold=0 -eni=0.02 -dni=0.02 -ne=3000 --n_hidden_t_enc=[100,100] --n_hidden_t_dec=[100,100] --n_hidden_s=[100] --n_hidden_u=[100] --gamma=20 --learning_rate=0.00003 -lra=.999 --patience=500 --optimizer=adam -bn=1 --embedding_source=histo3x26 -exp_name=dietnet_histo_ -rp=0
 
-![Result](https://raw.githubusercontent.com/ktaneishi/DietNetworks/python3/DietNetworks.png)
+![Result](https://raw.githubusercontent.com/ktaneishi/DietNetworks/master/DietNetworks.png)
 
 #### Parameters in experiments/variant2/learn_model.py
 - dataset: Str. Dataset name. (default: '1000_genomes').

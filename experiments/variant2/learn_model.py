@@ -265,7 +265,6 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Training loop
     start_training = time.time()
     for epoch in range(num_epochs):
-        print(epoch, patience)
         start_time = time.time()
         print("Epoch {} of {}".format(epoch+1, num_epochs))
         nb_minibatches = 0

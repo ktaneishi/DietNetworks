@@ -20,7 +20,7 @@ def generate_1000_genomes_hist(path, transpose=False, label_splits=None, feature
 
     if perclass:
         # the first dimension of the following is length 'number of snps'
-        nolabel_x = np.zeros((nolabel_orig.shape[0], 3*26))
+        nolabel_x = np.zeros((nolabel_orig.shape[0], 3*26)) # 3*26=78
         for i in range(nolabel_x.shape[0]):
             if i % 5000 == 0:
                 print("processing snp no: ", i)

@@ -123,10 +123,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     if resume:
         # Load best model
         with np.load(os.path.join(save_copy, 'dietnet_last.npz')) as f:
-            param_values = [f['arr_%d' % i]
-                            for i in range(len(f.files))]
-        nlayers = len(lasagne.layers.get_all_params(filter(None, nets) +
-                                                    [discrim_net]))
+            param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+
+        nlayers = len(lasagne.layers.get_all_params(filter(None, nets) + [discrim_net]))
+
         lasagne.layers.set_all_param_values(filter(None, nets) +
                                             [discrim_net],
                                             param_values[:nlayers])
@@ -153,11 +153,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     inputs = [input_var_sup, target_var_sup]
 
     # Define parameters
-    params = lasagne.layers.get_all_params(
-        [discrim_net]+list(filter(None, nets)), trainable=True, unwrap_shared=False)
-    params_to_freeze= \
-        lasagne.layers.get_all_params(filter(None, nets), trainable=False,
-                                      unwrap_shared=False)
+    params = lasagne.layers.get_all_params([discrim_net]+list(filter(None, nets)), trainable=True, unwrap_shared=False)
+    params_to_freeze= lasagne.layers.get_all_params(filter(None, nets), trainable=False, unwrap_shared=False)
 
     # Remove unshared variables from params and params_to_freeze
     params = [p for p in params if isinstance(p, theano.compile.sharedvalue.SharedVariable)]
@@ -165,7 +162,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     print("Params : ", params)
 
     feat_emb_var = next(p for p in lasagne.layers.get_all_params([discrim_net]) if p.name == 'input_unsup' or p.name == 'feat_emb')
-    # feat_emb_var = lasagne.layers.get_all_params([discrim_net])[0]
+
     print(feat_emb_var)
     feat_emb_val = feat_emb_var.get_value()
     feat_emb_norms = (feat_emb_val ** 2).sum(0) ** 0.5
@@ -193,13 +190,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Compute network updates
     assert optimizer in ["rmsprop", "adam"]
     if optimizer == "rmsprop":
-        updates = lasagne.updates.rmsprop(loss,
-                                        params,
-                                        learning_rate=lr)
+        updates = lasagne.updates.rmsprop(loss, params, learning_rate=lr)
+
     elif optimizer == "adam":
-        updates = lasagne.updates.adam(loss,
-                                       params,
-                                       learning_rate=lr)
+        updates = lasagne.updates.adam(loss, params, learning_rate=lr)
 
     # Apply norm constraints on the weights
     for k in updates.keys():
@@ -207,8 +201,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             updates[k] = lasagne.updates.norm_constraint(updates[k], 1.0)
 
     # Compile training function
-    train_fn = theano.function(inputs, loss, updates=updates,
-                               on_unused_input='ignore')
+    train_fn = theano.function(inputs, loss, updates=updates, on_unused_input='ignore')
 
     # Monitoring Labels
     monitor_labels = ["reconst. feat. W_enc",
@@ -240,8 +233,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
     # Compile validation function
     val_fn = theano.function(inputs,
-                             [prediction_sup_det] + val_outputs,
-                             on_unused_input='ignore')
+                             [prediction_sup_det] + val_outputs, on_unused_input='ignore')
 
     # Finally, launch the training loop.
     print("Starting training...")

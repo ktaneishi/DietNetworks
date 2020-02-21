@@ -11,9 +11,10 @@ download:
 	wget -c -P data ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/supporting/hd_genotype_chip/affy_samples.20141118.panel
 
 $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A.raw: data/ALL.wgs.nhgri_coriell_affy_6.20140825.genotypes_has_ped.vcf.gz
-	wget -c -P data https://www.cog-genomics.org/static/bin/plink180807/plink_linux_x86_64.zip
-	unzip -d plink data/plink_linux_x86_64.zip
+	wget -c -P data http://s3.amazonaws.com/plink1-assets/plink_linux_x86_64_20200219.zip
+	unzip -d plink data/plink_linux_x86_64_20200219.zip
 
+	mkdir -p $(TMPDIR)
 	# minor allele frequencies 5%, autosome = without X, Y, MT chromosomes
 	$(PLINK) --vcf data/ALL.wgs.nhgri_coriell_affy_6.20140825.genotypes_has_ped.vcf.gz --maf 0.05 --out $(TMPDIR)/affy_6_biallelic_snps_maf005_aut --not-chr X Y MT --make-bed
 

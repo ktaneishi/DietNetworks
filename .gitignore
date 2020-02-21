@@ -1,12 +1,6 @@
 # cache files
 __pycache__
 
-# temporary files
-temp
-
-# log files
-log
-
 # data files
 data
 

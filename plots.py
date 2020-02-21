@@ -8,6 +8,7 @@ import itertools
 import matplotlib.patches as mpatches
 import random
 
+
 def create_1000_genomes_continent_labels():
     labels = ['ACB', 'ASW', 'BEB', 'CDX', 'CEU', 'CHB', 'CHS', 'CLM', 'ESN',
               'FIN', 'GBR', 'GIH', 'GWD', 'IBS', 'ITU', 'JPT', 'KHV', 'LWK',
@@ -58,6 +59,7 @@ data = np.load(file_to_load)
 h = data['representation']
 l = data['label']
 
+
 if category == 'continent':
     continent_cat = create_1000_genomes_continent_labels()
     l_cont = np.zeros(l.shape)
@@ -73,6 +75,8 @@ else:
 
 colors_plot = [all_colors[el] for el in l]
 
+
+
 model = TSNE(n_components=tsne_n_comps, random_state=0)
 tsne_h = model.fit_transform(h)
 
@@ -85,7 +89,9 @@ fig = plt.figure(figsize=(12, 12))
 if tsne_n_comps == 3:
     ax = fig.add_subplot(111, projection='3d')
 
+
 ax.scatter(tsne_h[:, 0], tsne_h[:, 1], tsne_h[:, 2], c=colors_plot)
+
 
 print tsne_h[:, 0].min()
 print tsne_h[:, 0].max()
@@ -98,6 +104,8 @@ recs = []
 for i in range(0,len(all_colors)):
     recs.append(mpatches.Rectangle((0,0),1,1,fc=all_colors[i]))
 plt.legend(recs,labels,loc=4)
+
+
 
 # cb = plt.colorbar()
 # loc = np.arange(0, max(l),max(l)/float(len(colors_plot)))

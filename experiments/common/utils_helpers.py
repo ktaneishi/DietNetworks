@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import numpy as np
 from DietNetworks.experiments.common.dataset_utils import load_1000_genomes

@@ -1,29 +1,38 @@
-from __future__ import print_function
-import numpy as np
+import numpy
 import os
+"""
+from DietNetworks.experiments.common import (protein_loader, dorothea,
+                                                  reuters, imdb, iric_molecules,
+                                                  thousand_genomes)
+"""
 from DietNetworks.experiments.common import thousand_genomes
+
+
 
 def shuffle(data_sources, seed=23):
     """
-    Shuffles multiple data sources (np arrays) together so the
+    Shuffles multiple data sources (numpy arrays) together so the
     correspondance between data sources (such as inputs and targets) is
     maintained.
     """
-    np.random.seed(seed)
-    indices = np.arange(data_sources[0].shape[0])
-    np.random.shuffle(indices)
+
+    numpy.random.seed(seed)
+    indices = numpy.arange(data_sources[0].shape[0])
+    numpy.random.shuffle(indices)
 
     return [d[indices] for d in data_sources]
 
+
 def split(data_sources, splits):
     """
-    Splits the given data sources (np arrays) according to the provided
+    Splits the given data sources (numpy arrays) according to the provided
     split boundries.
 
     Ex : if splits is [0.6], every data source will be separated in two parts,
     the first containing 60% of the data and the other containing the
     remaining 40%.
     """
+
     if splits is None:
         return data_sources
 
@@ -39,6 +48,7 @@ def split(data_sources, splits):
     split_data_sources.append([d[end:] for d in data_sources])
 
     return split_data_sources
+
 
 def prune_splits(splits, nb_prune):
     """
@@ -57,7 +67,10 @@ def prune_splits(splits, nb_prune):
         normalization_constant = 1.0 / sum(splits)
     return [s * normalization_constant for s in splits[:-nb_prune]]
 
-def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=None, nolabels='raw', fold=0, norm=True):
+
+def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
+                      nolabels='raw', fold=0, norm=True,
+                      path=""):
 
     print(path)
 
@@ -79,8 +92,8 @@ def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=N
         test = all_folds[fold]
         all_folds = all_folds[:fold] + all_folds[(fold + 1):]
 
-        x = np.concatenate([el[0] for el in all_folds])
-        y = np.concatenate([el[1] for el in all_folds])
+        x = numpy.concatenate([el[0] for el in all_folds])
+        y = numpy.concatenate([el[1] for el in all_folds])
 
     # Data used for supervised training
     if not transpose:
@@ -101,16 +114,19 @@ def load_1000_genomes(path, transpose=False, label_splits=None, feature_splits=N
     elif nolabels == 'raw' and transpose:
         unsupervised_data = x.transpose()
     elif nolabels == 'histo3':
-        unsupervised_data = np.load(os.path.join(path, 'histo3_fold%d.npy' % fold))
+        unsupervised_data = numpy.load(os.path.join(path, 'histo3_fold' +
+                                    str(fold) + '.npy'))
     elif nolabels == 'histo3x26':
-        unsupervised_data = np.load(os.path.join(path, 'histo3x26_fold%d.npy' % fold))
+        unsupervised_data = numpy.load(os.path.join(path, 'histo3x26_fold' +
+                                    str(fold) + '.npy'))
     elif nolabels == 'bin':
-        unsupervised_data = np.load(os.path.join(path, 'snp_bin_fold%d.npy' % fold))
+        unsupervised_data = numpy.load(os.path.join(path, 'snp_bin_fold' +
+                                        str(fold) + '.npy'))
     elif nolabels == 'w2v':
         raise NotImplementedError
     else:
         try:
-            unsupervised_data = np.load(nolabels)
+            unsupervised_data = numpy.load(nolabels)
         except:
             raise ValueError('Could not load specified embedding source')
 

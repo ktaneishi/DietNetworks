@@ -1,8 +1,7 @@
-from __future__ import print_function
 import numpy as np
 import os
 import random
-from DietNetworks.experiments.common.dataset_utils import load_1000_genomes
+from DietNetworks.experiments.common import dataset_utils
 
 # Function to load data
 def load_data(dataset, dataset_path, embedding_source,
@@ -16,7 +15,8 @@ def load_data(dataset, dataset_path, embedding_source,
         # this corresponds to the split 60/20 of the whole data,
         # test is considered elsewhere as an extra 20% of the whole data
         splits = [.75]
-        data = load_1000_genomes(transpose=transpose, label_splits=splits,
+        data = dataset_utils.load_1000_genomes(transpose=transpose,
+                                    label_splits=splits,
                                     feature_splits=[.8],
                                     fold=which_fold,
                                     nolabels=embedding_input,
@@ -26,7 +26,8 @@ def load_data(dataset, dataset_path, embedding_source,
         return
 
     if not transpose:
-        (x_train, y_train), (x_valid, y_valid), (x_test, y_test), x_nolabel = data
+        (x_train, y_train), (x_valid, y_valid), (x_test, y_test),\
+            x_nolabel = data
     else:
         return data
 
@@ -53,7 +54,9 @@ def load_data(dataset, dataset_path, embedding_source,
     else:
         training_labels = y_train
 
-    return x_train, y_train, x_valid, y_valid, x_test, y_test, x_unsup, training_labels
+    return x_train, y_train, x_valid, y_valid, x_test, y_test, \
+        x_unsup, training_labels
+
 
 def define_exp_name(keep_labels, alpha, beta, gamma, lmd, n_hidden_u,
                     n_hidden_t_enc, n_hidden_t_dec, n_hidden_s, which_fold,
@@ -83,8 +86,10 @@ def define_exp_name(keep_labels, alpha, beta, gamma, lmd, n_hidden_u,
 
     return exp_name
 
+
 # Mini-batch iterator function
-def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
+def iterate_minibatches(inputs, targets, batchsize,
+                        shuffle=False):
     assert inputs.shape[0] == targets.shape[0]
     indices = np.arange(inputs.shape[0])
     if shuffle:
@@ -108,6 +113,7 @@ def iterate_testbatches(inputs, batchsize, shuffle=False):
         indices = np.random.permutation(inputs.shape[0])
     for i in range(0, inputs.shape[0]-batchsize+1, batchsize):
         yield inputs[indices[i:i+batchsize], :]
+
 
 def get_precision_recall_cutoff(predictions, targets):
 
@@ -137,6 +143,7 @@ def get_precision_recall_cutoff(predictions, targets):
             prev_threshold += threshold_inc
 
     return cutoff
+
 
 # Monitoring function
 def monitoring(minibatches, which_set, error_fn, monitoring_labels,
@@ -179,6 +186,7 @@ def monitoring(minibatches, which_set, error_fn, monitoring_labels,
     else:
         return monitoring_values
 
+
 def parse_int_list_arg(arg):
     if isinstance(arg, str):
         arg = eval(arg)
@@ -188,7 +196,9 @@ def parse_int_list_arg(arg):
     if isinstance(arg, int):
         return [arg]
     else:
-        raise ValueError("Following arg value could not be cast as a list of integer values : " % arg)
+        raise ValueError("Following arg value could not be cast as a list of"
+                         "integer values : " % arg)
+
 
 def parse_string_int_tuple(arg):
     if isinstance(arg, (list, tuple)):

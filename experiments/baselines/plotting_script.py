@@ -1,6 +1,9 @@
 import os
+
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 
 def main(results_path, which_method="pca", enc='triangle', n_comps=None):
 
@@ -45,13 +48,19 @@ def main(results_path, which_method="pca", enc='triangle', n_comps=None):
     plt.legend()
     plt.show()
 
+    import pdb
+    pdb.set_trace()
+
+
 if __name__ == '__main__':
-    results_path = "/data/lisatmp4/romerosa/DietNetworks/1000_genomes/results/"
+    results_path = \
+        "/data/lisatmp4/romerosa/DietNetworks/1000_genomes/results/"
 
     which_method = 'kmeans'
 
     if which_method == 'pca':
-        n_comps = [1, 2, 5, 10, 20, 50, 100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 2000, 2400, 2600, 2760]
+        n_comps = [1, 2, 5, 10, 20, 50, 100, 200, 400, 600, 800, 1000, 1200,
+                   1400, 1600, 2000, 2400, 2600, 2760]
     elif which_method == 'kmeans':
         n_comps = [1, 2, 5, 10, 20, 50, 100, 200, 500]
     else:

@@ -7,6 +7,7 @@ For getting an embedding of the features, see for instance
 featsel_unsupervised.py
 For getting an embedding of the data, see for instance
 benchmark/pca.py or benchmark/kmeans.py
+
 """
 from __future__ import print_function
 
@@ -22,6 +23,8 @@ import theano
 import theano.tensor as T
 
 from lasagne.nonlinearities import sigmoid, softmax
+
+
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
     """Generate the minibatches for learning."""
@@ -39,10 +42,12 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
         yield inputs[excerpt], targets[excerpt]
 
+
 def onehot_labels(labels, min_val, max_val):
     output = np.zeros((len(labels), max_val - min_val + 1), dtype="int32")
     output[np.arange(len(labels)), labels - min_val] = 1
     return output
+
 
 def generate_test_predictions(minibatches, pred_fn):
 
@@ -53,10 +58,12 @@ def generate_test_predictions(minibatches, pred_fn):
         inputs, _ = batch
 
         probs = pred_fn(inputs)
-        all_probabilities = np.concatenate((all_probabilities, probs[:, 1]), axis=0)
+        all_probabilities = np.concatenate((all_probabilities, probs[:, 1]),
+                                           axis=0)
 
         predictions = probs.argmax(axis=1)
-        all_predictions = np.concatenate((all_predictions, predictions), axis=0)
+        all_predictions = np.concatenate((all_predictions, predictions),
+                                         axis=0)
 
     # Write the predictions to a text file
     filename_pred = "test_preds_" + time.strftime("%Y-%M-%d_%T") + ".txt"
@@ -67,6 +74,7 @@ def generate_test_predictions(minibatches, pred_fn):
     filename_prob = "test_probs_" + time.strftime("%Y-%M-%d_%T") + ".txt"
     with open(filename_prob, "w") as f:
         f.write(",".join([str(p) for p in all_probabilities]))
+
 
 def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
@@ -90,6 +98,7 @@ def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
     return monitoring_dict
 
+
 # Main program
 def execute(samp_embedding_source, num_epochs=500,
             lr_value=1e-5, n_classes=1,
@@ -109,6 +118,7 @@ def execute(samp_embedding_source, num_epochs=500,
     of the data, you should provide the path of the npz file from save_path
     ('/data/lisatmp4/dejoieti/DietNetworks/')
     """
+
     # Load the dataset
     print("Loading data")
     f = np.load(os.path.join(save_path, samp_embedding_source))
@@ -157,11 +167,20 @@ def execute(samp_embedding_source, num_epochs=500,
     updates = lasagne.updates.rmsprop(loss,
                                       params,
                                       learning_rate=lr)
+    # updates = lasagne.updates.sgd(loss,
+    #                               params,
+    #                               learning_rate=lr)
+    # updates = lasagne.updates.momentum(loss, params,
+    #                                    learning_rate=lr, momentum=0.0)
+    # updates[lr] = T.max((lr * .99).astype('float32'), 1e-6)
+    # updates[lr] = (lr * 1.0).astype('float32')
 
     train_fn = theano.function([input_var, target_var], loss, updates=updates)
 
     # Expressions required for test
-    test_prediction = lasagne.layers.get_output(discrim_net, deterministic=True)
+    test_prediction = \
+        lasagne.layers.get_output(discrim_net,
+                                  deterministic=True)
     test_predictions_loss = lasagne.objectives.categorical_crossentropy(
         test_prediction, target_var).mean()
     test_prediction_acc = lasagne.objectives.categorical_accuracy(
@@ -181,19 +200,24 @@ def execute(samp_embedding_source, num_epochs=500,
     nb_step_upd_lr = 20
     prev_train_err_increments = np.asarray([0]*nb_step_upd_lr)
     idx = 0
-    train_minibatches = iterate_minibatches(x_train, y_train, n_batch, shuffle=False)
-    train_monitored = monitoring(train_minibatches, "train", val_fn, monitor_labels)
+    train_minibatches = iterate_minibatches(x_train, y_train, n_batch,
+                                                shuffle=False)
+    train_monitored = monitoring(train_minibatches, "train", val_fn,
+                                     monitor_labels)
         # Only monitor on the validation set if training in a supervised way
         # otherwise the dimensions will not match.
-    valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch, shuffle=False)
-    valid_monitored = monitoring(valid_minibatches, "valid", val_fn, monitor_labels)
+    valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch,
+                                                shuffle=False)
+    valid_monitored = monitoring(valid_minibatches, "valid", val_fn,
+                                     monitor_labels)
     # We iterate over epochs:
     for epoch in range(num_epochs):
         # In each epoch, we do a full pass over the training data to updates
         # the parameters:
         start_time = time.time()
 
-        for batch in iterate_minibatches(x_train, y_train, n_batch, shuffle=True):
+        for batch in iterate_minibatches(x_train, y_train, n_batch,
+                                         shuffle=True):
             inputs, targets = batch
             loss = train_fn(inputs, targets.astype("float32"))
 	    #if abs(prev_train_err_increments.sum()) < 1e-4:
@@ -203,12 +227,16 @@ def execute(samp_embedding_source, num_epochs=500,
         # if epoch % 25 == 0 :# Monitor progress
         print("Epoch {} of {}".format(epoch + 1, num_epochs))
 
-        train_minibatches = iterate_minibatches(x_train, y_train, n_batch, shuffle=False)
-        train_monitored = monitoring(train_minibatches, "train", val_fn, monitor_labels)
+        train_minibatches = iterate_minibatches(x_train, y_train, n_batch,
+                                                shuffle=False)
+        train_monitored = monitoring(train_minibatches, "train", val_fn,
+                   		     monitor_labels)
 	# Only monitor on the validation set if training in a supervised way
         # otherwise the dimensions will not match.
-        valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch, shuffle=False)
-        valid_monitored = monitoring(valid_minibatches, "valid", val_fn, monitor_labels)
+        valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch,
+                                                shuffle=False)
+        valid_monitored = monitoring(valid_minibatches, "valid", val_fn,
+                   	             monitor_labels)
 
         print("  total time:\t\t\t{:.3f}s".format(time.time() - start_time))
 
@@ -228,8 +256,10 @@ def execute(samp_embedding_source, num_epochs=500,
             # Monitor on the test set now because sometimes the saving doesn't
             # go well and there isn't a model to load at the end of training
             if y_test is not None:
-		test_minibatches = iterate_minibatches(x_test, y_test, n_batch, shuffle=False)
-                test_err = monitoring(test_minibatches, "test", val_fn, monitor_labels)
+		test_minibatches = iterate_minibatches(x_test, y_test, n_batch,
+                                           	       shuffle=False)
+                test_err = monitoring(test_minibatches, "test", val_fn,
+                                          monitor_labels)
         else:
             patience += 1
             # Save stuff
@@ -243,9 +273,11 @@ def execute(samp_embedding_source, num_epochs=500,
             print("Ending training")
             # Load best model
             with np.load(os.path.join(save_path, 'model_feat_sel_best.npz')) as f:
-                param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+                param_values = [f['arr_%d' % i]
+                                for i in range(len(f.files))]
             nlayers = len(lasagne.layers.get_all_params([discrim_net]))
-            lasagne.layers.set_all_param_values([discrim_net], param_values[:nlayers])
+            lasagne.layers.set_all_param_values([discrim_net],
+                                                param_values[:nlayers])
 	    # stop
 	    break
 
@@ -260,9 +292,12 @@ def execute(samp_embedding_source, num_epochs=500,
 
     print("Final results:")
 
-    test_mon = monitoring(test_minibatches, "test", val_fn, monitor_labels)
-    valid_mon = monitoring(valid_minibatches, "valid", val_fn, monitor_labels)
-    train_mon = monitoring(train_minibatches, "train", val_fn, monitor_labels)
+    test_mon = monitoring(test_minibatches, "test", val_fn,
+                          monitor_labels)
+    valid_mon = monitoring(valid_minibatches, "valid", val_fn,
+                           monitor_labels)
+    train_mon = monitoring(train_minibatches, "train", val_fn,
+                           monitor_labels)
 
     save_path = os.path.join(save_path, "results")
     if not os.path.exists(save_path):
@@ -283,6 +318,7 @@ def execute(samp_embedding_source, num_epochs=500,
     # with np.load('model.npz') as f:
     #     param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     # lasagne.layers.set_all_param_values(network, param_values)
+
 
 def main():
     """Run execute with the accurate arguments."""
@@ -313,6 +349,7 @@ def main():
 
     execute(args.dataset, args.feat_embedding_source,
             args.sample_embedding_source, int(args.num_epochs))
+
 
 if __name__ == '__main__':
     main()

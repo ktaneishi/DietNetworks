@@ -3,14 +3,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-from DietNetworks.experiments.common.dataset_utils import load_1000_genomes
+from DietNetworks.experiments.common import dataset_utils
 
 import model_helpers as mh
 
 def plot(dataset, which_set, continent=True):
 
     if dataset == '1000_genomes':
-        data = load_1000_genomes(transpose=False, label_splits=[.75])
+        data = dataset_utils.load_1000_genomes(transpose=False,
+                                               label_splits=[.75])
     else:
         print("Unknown dataset")
         return
@@ -77,6 +78,9 @@ def plot(dataset, which_set, continent=True):
 
     plt.show()
 
+
+
+
 def main():
     parser = argparse.ArgumentParser(description='Histograms.')
     parser.add_argument('-dataset',
@@ -91,6 +95,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 # ['CHB', 'JPT', 'CHS', 'CDX', 'KHV', 'CEU', 'TSI', 'FIN', 'GBR', 'IBS', 'YRI', 'LWK', 'GWD', 'MSL', 'ESN', 'ASW', 'ACB', 'MXL', 'PUR', 'CLM', 'PEL', 'GIH', 'PJL', 'BEB', 'STU', 'ITU']
 # ['ACB', 'ASW', 'BEB', 'CDX', 'CEU', 'CHB', 'CHS', 'CLM', 'ESN', 'FIN', 'GBR', 'GIH', 'GWD', 'IBS', 'ITU', 'JPT', 'KHV', 'LWK', 'MSL', 'MXL', 'PEL', 'PJL', 'PUR', 'STU', 'TSI', 'YRI']

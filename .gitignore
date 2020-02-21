@@ -1,8 +1,19 @@
-# cache files
+# skfeature
+skfeature
+
 __pycache__
+*.pyc
+slurm*
 
-# data files
-data
+imdb/*
 
-# plink executables
+# saved models and results
+feature_selection/1000_genomes*
+learn_gene_vector_*
+shuffle*
+
+# cluster logs
+LOGS/*
+
+# plink executable
 plink

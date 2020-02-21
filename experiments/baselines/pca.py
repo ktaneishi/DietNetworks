@@ -7,7 +7,8 @@ import os
 import numpy as np
 import time
 
-def pca(dataset, n_comp_list, save_path, dataset_path, method="pca", which_fold=0):
+def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
+        dataset_path = ''):
 
     # Load the dataset
     print("Loading data")
@@ -60,7 +61,7 @@ if __name__ == '__main__':
                         help='dataset')
     parser.add_argument('-save_path',
                         '-sp',
-                        default,
+                        default='',
                         help='number of components for embedding')
 
     args = parser.parse_args()

@@ -1,3 +1,4 @@
+
 from __future__ import print_function
 import argparse
 import time
@@ -18,8 +19,11 @@ import theano.tensor as T
 
 from DietNetworks.experiments.common import dataset_utils
 
+import matplotlib.pyplot as plt
+
 import mainloop_helpers as mlh
 import model_helpers as mh
+
 
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
@@ -231,6 +235,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
     print(os.path.join(save_path, 'cm' + str(which_fold) + '.npz'))
 
+    # plt.imshow(cm)
+    # plt.show()
+
+
 def main():
     parser = argparse.ArgumentParser(description="""Test Diet Networks""")
     parser.add_argument('--dataset',
@@ -362,6 +370,7 @@ def main():
                 args.dataset_path,
                 args.resume,
                 args.exp_name)
+
 
 if __name__ == '__main__':
     main()

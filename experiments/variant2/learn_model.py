@@ -1,4 +1,3 @@
-from __future__ import print_function
 import argparse
 import time
 import os
@@ -13,6 +12,8 @@ import theano.tensor as T
 import mainloop_helpers as mlh
 import model_helpers as mh
 
+
+
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             embedding_source=None,
@@ -22,7 +23,9 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             max_patience=100, batchnorm=0, keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
             early_stop_criterion='loss_sup_det',
-            save_path='./', save_copy='./', dataset_path='./',
+            save_path='./',
+            save_copy='./',
+            dataset_path='./',
             resume=False, exp_name='', random_proj=0):
 
     # Prepare embedding information
@@ -123,10 +126,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     if resume:
         # Load best model
         with np.load(os.path.join(save_copy, 'dietnet_last.npz')) as f:
-            param_values = [f['arr_%d' % i] for i in range(len(f.files))]
-
-        nlayers = len(lasagne.layers.get_all_params(filter(None, nets) + [discrim_net]))
-
+            param_values = [f['arr_%d' % i]
+                            for i in range(len(f.files))]
+        nlayers = len(lasagne.layers.get_all_params(filter(None, nets) +
+                                                    [discrim_net]))
         lasagne.layers.set_all_param_values(filter(None, nets) +
                                             [discrim_net],
                                             param_values[:nlayers])
@@ -152,9 +155,20 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Define inputs
     inputs = [input_var_sup, target_var_sup]
 
+    """
     # Define parameters
-    params = lasagne.layers.get_all_params([discrim_net]+list(filter(None, nets)), trainable=True, unwrap_shared=False)
-    params_to_freeze= lasagne.layers.get_all_params(filter(None, nets), trainable=False, unwrap_shared=False)
+    params = lasagne.layers.get_all_params(
+        [discrim_net]+filter(None, nets), trainable=True)
+    params_to_freeze= \
+        lasagne.layers.get_all_params(filter(None, nets), trainable=False)
+    """
+
+    # Define parameters
+    params = lasagne.layers.get_all_params(
+        [discrim_net]+list(filter(None, nets)), trainable=True, unwrap_shared=False)
+    params_to_freeze= \
+        lasagne.layers.get_all_params(filter(None, nets), trainable=False,
+                                      unwrap_shared=False)
 
     # Remove unshared variables from params and params_to_freeze
     params = [p for p in params if isinstance(p, theano.compile.sharedvalue.SharedVariable)]
@@ -162,7 +176,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     print("Params : ", params)
 
     feat_emb_var = next(p for p in lasagne.layers.get_all_params([discrim_net]) if p.name == 'input_unsup' or p.name == 'feat_emb')
-
+    # feat_emb_var = lasagne.layers.get_all_params([discrim_net])[0]
     print(feat_emb_var)
     feat_emb_val = feat_emb_var.get_value()
     feat_emb_norms = (feat_emb_val ** 2).sum(0) ** 0.5
@@ -190,10 +204,18 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Compute network updates
     assert optimizer in ["rmsprop", "adam"]
     if optimizer == "rmsprop":
-        updates = lasagne.updates.rmsprop(loss, params, learning_rate=lr)
-
+        updates = lasagne.updates.rmsprop(loss,
+                                        params,
+                                        learning_rate=lr)
     elif optimizer == "adam":
-        updates = lasagne.updates.adam(loss, params, learning_rate=lr)
+        updates = lasagne.updates.adam(loss,
+                                       params,
+                                       learning_rate=lr)
+    # updates = lasagne.updates.sgd(loss,
+    #                               params,
+    #                               learning_rate=lr)
+    # updates = lasagne.updates.momentum(loss, params,
+    #                                    learning_rate=lr, momentum=0.0)
 
     # Apply norm constraints on the weights
     for k in updates.keys():
@@ -201,7 +223,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             updates[k] = lasagne.updates.norm_constraint(updates[k], 1.0)
 
     # Compile training function
-    train_fn = theano.function(inputs, loss, updates=updates, on_unused_input='ignore')
+    train_fn = theano.function(inputs, loss, updates=updates,
+                               on_unused_input='ignore')
 
     # Monitoring Labels
     monitor_labels = ["reconst. feat. W_enc",
@@ -233,7 +256,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
     # Compile validation function
     val_fn = theano.function(inputs,
-                             [prediction_sup_det] + val_outputs, on_unused_input='ignore')
+                             [prediction_sup_det] + val_outputs,
+                             on_unused_input='ignore')
 
     # Finally, launch the training loop.
     print("Starting training...")
@@ -248,11 +272,15 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Pre-training monitoring
     print("Epoch 0 of {}".format(num_epochs))
 
-    train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
-    train_err = mlh.monitoring(train_minibatches, "train", val_fn, monitor_labels, prec_recall_cutoff)
+    train_minibatches = mlh.iterate_minibatches(x_train, y_train,
+                                                batch_size, shuffle=False)
+    train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+                               monitor_labels, prec_recall_cutoff)
 
-    valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
-    valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn, monitor_labels, prec_recall_cutoff)
+    valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
+                                                batch_size, shuffle=False)
+    valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+                               monitor_labels, prec_recall_cutoff)
 
     # Training loop
     start_training = time.time()
@@ -264,7 +292,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
         # Train pass
         for batch in mlh.iterate_minibatches(x_train, training_labels,
-                                             batch_size, shuffle=True):
+                                             batch_size,
+                                             shuffle=True):
             loss_epoch += train_fn(*batch)
             nb_minibatches += 1
 
@@ -272,18 +301,23 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         train_loss += [loss_epoch]
 
         # Monitoring on the training set
-        train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
-        train_err = mlh.monitoring(train_minibatches, "train", val_fn, monitor_labels, prec_recall_cutoff)
+        train_minibatches = mlh.iterate_minibatches(x_train, y_train,
+                                                    batch_size, shuffle=False)
+        train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+                                   monitor_labels, prec_recall_cutoff)
         train_monitored += [train_err]
 
         # Monitoring on the validation set
-        valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
+        valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
+                                                    batch_size, shuffle=False)
 
-        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn, monitor_labels, prec_recall_cutoff)
+        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+                                   monitor_labels, prec_recall_cutoff)
         valid_monitored += [valid_err]
 
         try:
-            early_stop_val = valid_err[monitor_labels.index(early_stop_criterion)]
+            early_stop_val = valid_err[
+                monitor_labels.index(early_stop_criterion)]
         except:
             raise ValueError("There is no monitored value by the name of %s" %
                              early_stop_criterion)
@@ -311,7 +345,9 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             # Monitor on the test set now because sometimes the saving doesn't
             # go well and there isn't a model to load at the end of training
             if y_test is not None:
-                test_minibatches = mlh.iterate_minibatches(x_test, y_test, 138, shuffle=False)
+                test_minibatches = mlh.iterate_minibatches(x_test, y_test,
+                                                           138,
+                                                           shuffle=False)
 
                 test_err = mlh.monitoring(test_minibatches, "test", val_fn,
                                           monitor_labels, prec_recall_cutoff)
@@ -319,7 +355,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             patience += 1
             # Save stuff
             np.savez(os.path.join(save_path, 'dietnet_last.npz'),
-                     *lasagne.layers.get_all_param_values(list(filter(None, nets)) + [discrim_net]))
+                     *lasagne.layers.get_all_param_values(list(filter(None, nets)) +
+                                                          [discrim_net]))
             np.savez(save_path + "/errors_supervised_last.npz",
                      zip(*train_monitored), zip(*valid_monitored))
 
@@ -338,26 +375,35 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             if embedding_source is None:
                 # Save embedding
                 pred = pred_feat_emb()
-                np.savez(os.path.join(save_path, 'feature_embedding.npz'), pred)
+                np.savez(os.path.join(save_path, 'feature_embedding.npz'),
+                         pred)
 
             # Training set results
-            train_minibatches = mlh.iterate_minibatches(x_train, y_train, batch_size, shuffle=False)
+            train_minibatches = mlh.iterate_minibatches(x_train, y_train,
+                                                        batch_size,
+                                                        shuffle=False)
             train_err = mlh.monitoring(train_minibatches, "train", val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Validation set results
-            valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid, batch_size, shuffle=False)
+            valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
+                                                        batch_size,
+                                                        shuffle=False)
             valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Test set results
             if y_test is not None:
-                test_minibatches = mlh.iterate_minibatches(x_test, y_test, 138, shuffle=False)
+                test_minibatches = mlh.iterate_minibatches(x_test, y_test,
+                                                           138,
+                                                           shuffle=False)
 
                 test_err = mlh.monitoring(test_minibatches, "test", val_fn,
                                           monitor_labels, prec_recall_cutoff)
             else:
-                for minibatch in mlh.iterate_testbatches(x_test, 138, shuffle=False):
+                for minibatch in mlh.iterate_testbatches(x_test,
+                                                         138,
+                                                         shuffle=False):
                     test_predictions = []
                     test_predictions += [predict(minibatch)]
                 np.savez(os.path.join(save_path, 'test_predictions.npz'),
@@ -380,6 +426,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     if save_path != save_copy:
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
+
 
 def main():
     parser = argparse.ArgumentParser(description="""Train Diet Networks""")
@@ -541,6 +588,7 @@ def main():
             args.resume,
             args.exp_name,
             int(args.random_proj))
+
 
 if __name__ == '__main__':
     main()

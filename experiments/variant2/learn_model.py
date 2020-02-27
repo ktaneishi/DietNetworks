@@ -270,7 +270,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     train_loss = []
 
     # Pre-training monitoring
-    print("Epoch 0 of {}".format(num_epochs))
+    print("Epoch 0 of {}".format(num_epochs), end=' ')
 
     train_minibatches = mlh.iterate_minibatches(x_train, y_train,
                                                 batch_size, shuffle=False)
@@ -281,12 +281,13 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
                                                 batch_size, shuffle=False)
     valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
                                monitor_labels, prec_recall_cutoff)
+    print('')
 
     # Training loop
     start_training = time.time()
     for epoch in range(num_epochs):
         start_time = time.time()
-        print("Epoch {} of {}".format(epoch+1, num_epochs))
+        print("Epoch {} of {}".format(epoch+1, num_epochs), end=' ')
         nb_minibatches = 0
         loss_epoch = 0
 
@@ -410,11 +411,11 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
                          test_predictions)
 
             # Stop
-            print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() -
+            print("epoch time:{:6.3f}s".format(time.time() -
                                                          start_time))
             break
 
-        print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() - start_time))
+        print("epoch time:{:6.3f}s".format(time.time() - start_time))
 
         # Anneal the learning rate
         lr.set_value(float(lr.get_value() * learning_rate_annealing))

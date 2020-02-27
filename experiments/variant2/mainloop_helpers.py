@@ -148,7 +148,7 @@ def get_precision_recall_cutoff(predictions, targets):
 # Monitoring function
 def monitoring(minibatches, which_set, error_fn, monitoring_labels,
                prec_recall_cutoff=True, start=1, return_pred=False):
-    print('-'*20 + which_set + ' monit.' + '-'*20)
+    print('')
     prec_recall_cutoff = False if start == 0 else prec_recall_cutoff
     monitoring_values = np.zeros(len(monitoring_labels), dtype="float32")
     global_batches = 0
@@ -172,14 +172,14 @@ def monitoring(minibatches, which_set, error_fn, monitoring_labels,
     # Print monitored values
     monitoring_values /= global_batches
     for (label, val) in zip(monitoring_labels, monitoring_values):
-        print ("  {} {}:\t\t{:.6f}".format(which_set, label, val))
+        print ("{:5s} {}:{:9.6f}".format(which_set, label, val), end=' ')
 
     # If needed, compute and print the precision-recall breakoff point
     if prec_recall_cutoff:
         predictions = np.vstack(predictions)
         targets = np.vstack(targets)
         cutoff = get_precision_recall_cutoff(predictions, targets)
-        print ("  {} precis/recall cutoff:\t{:.6f}".format(which_set, cutoff))
+        print ("{:5s} precis/recall cutoff:{:9.6f}".format(which_set, cutoff), end=' ')
 
     if return_pred:
         return monitoring_values, np.vstack(predictions), np.vstack(targets)

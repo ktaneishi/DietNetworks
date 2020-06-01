@@ -26,7 +26,9 @@ $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A.raw: data/ALL.wgs.nhgri_cor
 $(TMPDIR)/histo3x26_fold0.npy: $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A.raw
 	PYTHONPATH=../ python experiments/common/utils_helpers.py $(TMPDIR)/
 
-run: $(TMPDIR)/histo3x26_fold0.npy 
+preprocess: $(TMPDIR)/histo3x26_fold0.npy
+
+run: preprocess
 	PYTHONPATH=../ python experiments/variant2/learn_model.py -eni=0.02 -dni=0.02 -ne=3000 \
 		--n_hidden_t_enc=[100,100] --n_hidden_t_dec=[100,100] --n_hidden_s=[100] --n_hidden_u=[100] \
 		--gamma=0 --learning_rate=0.00003 -lra=.999 --patience=500 --optimizer=adam -bn=1 \

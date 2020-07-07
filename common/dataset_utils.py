@@ -1,7 +1,7 @@
 import numpy
 import os
 
-from DietNetworks.common import thousand_genomes
+from common import thousand_genomes
 
 def shuffle(data_sources, seed=23):
     '''
@@ -19,6 +19,7 @@ def split(data_sources, splits):
     '''
     Splits the given data sources (numpy arrays) according to the provided
     split boundries.
+
     Ex : if splits is [0.6], every data source will be separated in two parts,
     the first containing 60% of the data and the other containing the
     remaining 40%.
@@ -100,14 +101,11 @@ def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
     elif nolabels == 'raw' and transpose:
         unsupervised_data = x.transpose()
     elif nolabels == 'histo3':
-        unsupervised_data = numpy.load(os.path.join(path, 'histo3_fold' +
-                                    str(fold) + '.npy'))
+        unsupervised_data = numpy.load(os.path.join(path, 'histo3_fold%d.npy' % fold))
     elif nolabels == 'histo3x26':
-        unsupervised_data = numpy.load(os.path.join(path, 'histo3x26_fold' +
-                                    str(fold) + '.npy'))
+        unsupervised_data = numpy.load(os.path.join(path, 'histo3x26_fold%d.npy' % fold))
     elif nolabels == 'bin':
-        unsupervised_data = numpy.load(os.path.join(path, 'snp_bin_fold' +
-                                        str(fold) + '.npy'))
+        unsupervised_data = numpy.load(os.path.join(path, 'snp_bin_fold%d.npy' % fold))
     elif nolabels == 'w2v':
         raise NotImplementedError
     else:

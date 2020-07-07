@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import random
-from DietNetworks.common import dataset_utils
+from common import dataset_utils
 
 # Function to load data
 def load_data(dataset, dataset_path, embedding_source,
@@ -22,7 +22,7 @@ def load_data(dataset, dataset_path, embedding_source,
                                     nolabels=embedding_input,
                                     norm=norm, path=dataset_path)
     else:
-        print("Unknown dataset")
+        print('Unknown dataset')
         return
 
     if not transpose:
@@ -57,7 +57,6 @@ def load_data(dataset, dataset_path, embedding_source,
     return x_train, y_train, x_valid, y_valid, x_test, y_test, \
         x_unsup, training_labels
 
-
 def define_exp_name(keep_labels, alpha, beta, gamma, lmd, n_hidden_u,
                     n_hidden_t_enc, n_hidden_t_dec, n_hidden_s, which_fold,
                     lr, dni, eni, earlystop, anneal):
@@ -72,20 +71,19 @@ def define_exp_name(keep_labels, alpha, beta, gamma, lmd, n_hidden_u,
         (('_l2-' + str(lmd)) if lmd > 0. else '')
     exp_name += '_hu'
     for i in range(len(n_hidden_u)):
-        exp_name += ("-" + str(n_hidden_u[i]))
+        exp_name += ('-' + str(n_hidden_u[i]))
     exp_name += '_tenc'
     for i in range(len(n_hidden_t_enc)):
-        exp_name += ("-" + str(n_hidden_t_enc[i]))
+        exp_name += ('-' + str(n_hidden_t_enc[i]))
     exp_name += '_tdec'
     for i in range(len(n_hidden_t_dec)):
-        exp_name += ("-" + str(n_hidden_t_dec[i]))
+        exp_name += ('-' + str(n_hidden_t_dec[i]))
     exp_name += '_hs'
     for i in range(len(n_hidden_s)):
-        exp_name += ("-" + str(n_hidden_s[i]))
+        exp_name += ('-' + str(n_hidden_s[i]))
     exp_name += '_fold' + str(which_fold)
 
     return exp_name
-
 
 # Mini-batch iterator function
 def iterate_minibatches(inputs, targets, batchsize,
@@ -106,14 +104,12 @@ def iterate_minibatches_unsup(x, batch_size, shuffle=False):
     for i in range(0, x.shape[0]-batch_size+1, batch_size):
         yield x[indices[i:i+batch_size], :]
 
-
 def iterate_testbatches(inputs, batchsize, shuffle=False):
     indices = np.arange(inputs.shape[0])
     if shuffle:
         indices = np.random.permutation(inputs.shape[0])
     for i in range(0, inputs.shape[0]-batchsize+1, batchsize):
         yield inputs[indices[i:i+batchsize], :]
-
 
 def get_precision_recall_cutoff(predictions, targets):
 
@@ -144,13 +140,12 @@ def get_precision_recall_cutoff(predictions, targets):
 
     return cutoff
 
-
 # Monitoring function
 def monitoring(minibatches, which_set, error_fn, monitoring_labels,
                prec_recall_cutoff=True, start=1, return_pred=False):
     print('')
     prec_recall_cutoff = False if start == 0 else prec_recall_cutoff
-    monitoring_values = np.zeros(len(monitoring_labels), dtype="float32")
+    monitoring_values = np.zeros(len(monitoring_labels), dtype='float32')
     global_batches = 0
 
     targets = []
@@ -172,20 +167,19 @@ def monitoring(minibatches, which_set, error_fn, monitoring_labels,
     # Print monitored values
     monitoring_values /= global_batches
     for (label, val) in zip(monitoring_labels, monitoring_values):
-        print ("{:5s} {}:{:9.6f}".format(which_set, label, val), end=' ')
+        print ('{:5s} {}:{:9.6f}'.format(which_set, label, val), end=' ')
 
     # If needed, compute and print the precision-recall breakoff point
     if prec_recall_cutoff:
         predictions = np.vstack(predictions)
         targets = np.vstack(targets)
         cutoff = get_precision_recall_cutoff(predictions, targets)
-        print ("{:5s} precis/recall cutoff:{:9.6f}".format(which_set, cutoff), end=' ')
+        print ('{:5s} precis/recall cutoff:{:9.6f}'.format(which_set, cutoff), end=' ')
 
     if return_pred:
         return monitoring_values, np.vstack(predictions), np.vstack(targets)
     else:
         return monitoring_values
-
 
 def parse_int_list_arg(arg):
     if isinstance(arg, str):
@@ -196,15 +190,14 @@ def parse_int_list_arg(arg):
     if isinstance(arg, int):
         return [arg]
     else:
-        raise ValueError("Following arg value could not be cast as a list of"
-                         "integer values : " % arg)
-
+        raise ValueError('Following arg value could not be cast as a list of'
+                         'integer values : ' % arg)
 
 def parse_string_int_tuple(arg):
     if isinstance(arg, (list, tuple)):
         return arg
     elif isinstance(arg, str):
-        tmp = arg.strip("()[]").split(",")
+        tmp = arg.strip('()[]').split(',')
         assert (len(tmp) == 2)
         return (tmp[0], eval(tmp[1]))
     else:

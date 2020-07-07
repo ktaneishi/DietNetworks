@@ -1,7 +1,8 @@
-import os
 import numpy as np
-from DietNetworks.experiments.common import dataset_utils
 import sys
+import os
+
+from common import dataset_utils
 
 def generate_1000_genomes_hist(transpose=False, label_splits=None,
                                feature_splits=None, fold=0, perclass=False, path = ''):
@@ -51,10 +52,7 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None,
 
     np.save(os.path.join(path, filename), nolabel_x)
 
-def generate_1000_genomes_bag_of_genes(
-        transpose=False, label_splits=None,
-        feature_splits=[0.8], fold=0,
-        path = ''):
+def generate_1000_genomes_bag_of_genes(transpose=False, label_splits=None, feature_splits=[0.8], fold=0, path = ''):
 
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose, label_splits=label_splits,
                                                  feature_splits=feature_splits, fold=fold,
@@ -80,18 +78,14 @@ def generate_1000_genomes_bag_of_genes(
     nolabel_x[mod1] += 1
     nolabel_x[mod2] += 1
 
-def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
-                                  feature_splits=None, fold=0,
-                                  path = ''):
+def generate_1000_genomes_snp2bin(transpose=False, label_splits=None, feature_splits=None, fold=0, path = ''):
 
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose, label_splits=label_splits,
-                                                     feature_splits=feature_splits, fold=fold,
-                                                     norm=False)
+                                                     feature_splits=feature_splits, fold=fold, norm=False)
 
     # Generate no_label: fuse train and valid sets
     nolabel_orig = (np.vstack([train[0], valid[0]]))
-    nolabel_x = np.zeros((nolabel_orig.shape[0], nolabel_orig.shape[1]*2),
-                         dtype='uint8')
+    nolabel_x = np.zeros((nolabel_orig.shape[0], nolabel_orig.shape[1]*2), dtype='uint8')
     filename = 'unsupervised_snp_bin_fold' + str(fold) + '.npy'
 
     # SNP to bin
@@ -107,5 +101,4 @@ if __name__ == '__main__':
     for fold in range(nfold):
         print(fold)
         generate_1000_genomes_hist(transpose=False, label_splits=[.75],
-                                   feature_splits=[1.], fold=fold, perclass=True,
-                                   path=path)
+                                   feature_splits=[1.], fold=fold, perclass=True, path=path)

@@ -38,15 +38,15 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
         yield inputs[excerpt], targets[excerpt]
 
 def onehot_labels(labels, min_val, max_val):
-    output = np.zeros((len(labels), max_val - min_val + 1), dtype="int32")
+    output = np.zeros((len(labels), max_val - min_val + 1), dtype='int32')
     output[np.arange(len(labels)), labels - min_val] = 1
     return output
 
 def generate_test_predictions(minibatches, pred_fn):
 
     # Obtain the predictions over all the examples
-    all_predictions = np.zeros((0), "int32")
-    all_probabilities = np.zeros((0), "float32")
+    all_predictions = np.zeros((0), 'int32')
+    all_probabilities = np.zeros((0), 'float32')
     for batch in minibatches:
         inputs, _ = batch
 
@@ -59,18 +59,18 @@ def generate_test_predictions(minibatches, pred_fn):
                                          axis=0)
 
     # Write the predictions to a text file
-    filename_pred = "test_preds_" + time.strftime("%Y-%M-%d_%T") + ".txt"
-    with open(filename_pred, "w") as f:
-        f.write(",".join([str(p) for p in all_predictions]))
+    filename_pred = 'test_preds_' + time.strftime('%Y-%M-%d_%T') + '.txt'
+    with open(filename_pred, 'w') as f:
+        f.write(','.join([str(p) for p in all_predictions]))
 
     # Also write the probabilities of the positive class to a text file
-    filename_prob = "test_probs_" + time.strftime("%Y-%M-%d_%T") + ".txt"
-    with open(filename_prob, "w") as f:
-        f.write(",".join([str(p) for p in all_probabilities]))
+    filename_prob = 'test_probs_' + time.strftime('%Y-%M-%d_%T') + '.txt'
+    with open(filename_prob, 'w') as f:
+        f.write(','.join([str(p) for p in all_probabilities]))
 
 def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
-    monitoring_values = np.zeros(len(monitoring_labels), dtype="float32")
+    monitoring_values = np.zeros(len(monitoring_labels), dtype='float32')
     monitoring_dict = {}
     global_batches = 0
 
@@ -78,14 +78,14 @@ def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
         inputs, targets = batch
 
         # Update monitored values
-        out = val_fn(inputs, targets.astype("float32"))
+        out = val_fn(inputs, targets.astype('float32'))
         monitoring_values += out
         global_batches += 1
 
     # Print monitored values
     monitoring_values /= global_batches
     for (label, val) in zip(monitoring_labels, monitoring_values):
-        print ("  {}\t{}:\t\t{:.6f}".format(dataset_name, label, val))
+        print ('  {}\t{}:\t\t{:.6f}'.format(dataset_name, label, val))
         monitoring_dict[label] = val
 
     return monitoring_dict
@@ -111,7 +111,7 @@ def execute(samp_embedding_source, num_epochs=500,
     '''
 
     # Load the dataset
-    print("Loading data")
+    print('Loading data')
     f = np.load(os.path.join(save_path, samp_embedding_source))
     exp_name = samp_embedding_source[:-4]
     save_path = os.path.join(save_path, exp_name)
@@ -128,7 +128,7 @@ def execute(samp_embedding_source, num_epochs=500,
     n_samples, n_feats = x_train.shape
     n_batch = 10
 
-    print("Building model")
+    print('Building model')
     # Prepare Theano variables for inputs and targets
     input_var = T.matrix('inputs')
     target_var = T.matrix('targets')
@@ -137,8 +137,8 @@ def execute(samp_embedding_source, num_epochs=500,
     test_values = False
     if test_values:
         theano.config.compute_test_value = 'raise'
-        input_var.tag.test_value = np.zeros((10, 2760), dtype="float32")
-        target_var.tag.test_value = np.ones((10, 26), dtype="float32")
+        input_var.tag.test_value = np.zeros((10, 2760), dtype='float32')
+        target_var.tag.test_value = np.ones((10, 26), dtype='float32')
 
     # Build model
     discrim_net = InputLayer((n_batch, n_feats), input_var)
@@ -148,7 +148,7 @@ def execute(samp_embedding_source, num_epochs=500,
         nonlinearity=(softmax if n_classes > 1 else sigmoid))
 
     # Create a loss expression for training
-    print("Building and compiling training functions")
+    print('Building and compiling training functions')
 
     # Expressions required for training
     prediction = lasagne.layers.get_output(discrim_net)
@@ -182,10 +182,10 @@ def execute(samp_embedding_source, num_epochs=500,
                               test_prediction_acc],
                              on_unused_input='ignore')
 
-    monitor_labels = ["pred. loss", "pred. acc"]
+    monitor_labels = ['pred. loss', 'pred. acc']
 
     # Finally, launch the training loop.
-    print("Starting training...")
+    print('Starting training...')
     patience = 0 # early stopping patience
     max_patience = 100
     nb_step_upd_lr = 20
@@ -193,13 +193,13 @@ def execute(samp_embedding_source, num_epochs=500,
     idx = 0
     train_minibatches = iterate_minibatches(x_train, y_train, n_batch,
                                                 shuffle=False)
-    train_monitored = monitoring(train_minibatches, "train", val_fn,
+    train_monitored = monitoring(train_minibatches, 'train', val_fn,
                                      monitor_labels)
         # Only monitor on the validation set if training in a supervised way
         # otherwise the dimensions will not match.
     valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch,
                                                 shuffle=False)
-    valid_monitored = monitoring(valid_minibatches, "valid", val_fn,
+    valid_monitored = monitoring(valid_minibatches, 'valid', val_fn,
                                      monitor_labels)
     # We iterate over epochs:
     for epoch in range(num_epochs):
@@ -210,38 +210,38 @@ def execute(samp_embedding_source, num_epochs=500,
         for batch in iterate_minibatches(x_train, y_train, n_batch,
                                          shuffle=True):
             inputs, targets = batch
-            loss = train_fn(inputs, targets.astype("float32"))
+            loss = train_fn(inputs, targets.astype('float32'))
 	    #if abs(prev_train_err_increments.sum()) < 1e-4:
             #    lr.set_value((lr.get_value()*0.6).astype('float32'))
             #prev_train_err_increments[idx] = loss
             #idx =(idx+1)%nb_step_upd_lr
         # if epoch % 25 == 0 :# Monitor progress
-        print("Epoch {} of {}".format(epoch + 1, num_epochs))
+        print('Epoch {} of {}'.format(epoch + 1, num_epochs))
 
         train_minibatches = iterate_minibatches(x_train, y_train, n_batch,
                                                 shuffle=False)
-        train_monitored = monitoring(train_minibatches, "train", val_fn,
+        train_monitored = monitoring(train_minibatches, 'train', val_fn,
                    		     monitor_labels)
 	# Only monitor on the validation set if training in a supervised way
         # otherwise the dimensions will not match.
         valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch,
                                                 shuffle=False)
-        valid_monitored = monitoring(valid_minibatches, "valid", val_fn,
+        valid_monitored = monitoring(valid_minibatches, 'valid', val_fn,
                    	             monitor_labels)
 
-        print("  total time:\t\t\t{:.3f}s".format(time.time() - start_time))
+        print('  total time:\t\t\t{:.3f}s'.format(time.time() - start_time))
 
 	# Early stopping
         if epoch == 0:
-            best_valid = valid_monitored["pred. loss"]
-        elif (valid_monitored["pred. loss"] < best_valid):
-            best_valid = valid_monitored["pred. loss"]
+            best_valid = valid_monitored['pred. loss']
+        elif (valid_monitored['pred. loss'] < best_valid):
+            best_valid = valid_monitored['pred. loss']
             patience = 0
 
             # Save stuff
             np.savez(os.path.join(save_path, 'model_feat_sel_best.npz'),
                      *lasagne.layers.get_all_param_values([discrim_net]))
-            np.savez(save_path + "/errors_supervised_best.npz",
+            np.savez(save_path + '/errors_supervised_best.npz',
                      zip(*train_monitored), zip(*valid_monitored))
 
             # Monitor on the test set now because sometimes the saving doesn't
@@ -249,19 +249,19 @@ def execute(samp_embedding_source, num_epochs=500,
             if y_test is not None:
 		test_minibatches = iterate_minibatches(x_test, y_test, n_batch,
                                            	       shuffle=False)
-                test_err = monitoring(test_minibatches, "test", val_fn,
+                test_err = monitoring(test_minibatches, 'test', val_fn,
                                           monitor_labels)
         else:
             patience += 1
             # Save stuff
             np.savez(os.path.join(save_path, 'model_feat_sel_last.npz'),
                      *lasagne.layers.get_all_param_values([discrim_net]))
-            np.savez(save_path + "/errors_supervised_last.npz",
+            np.savez(save_path + '/errors_supervised_last.npz',
                      zip(*train_monitored), zip(*valid_monitored))
 
 	# End training
         if patience == max_patience or epoch == num_epochs-1:
-            print("Ending training")
+            print('Ending training')
             # Load best model
             with np.load(os.path.join(save_path, 'model_feat_sel_best.npz')) as f:
                 param_values = [f['arr_%d' % i]
@@ -281,29 +281,29 @@ def execute(samp_embedding_source, num_epochs=500,
     valid_minibatches = iterate_minibatches(x_valid, y_valid, n_batch,
                                             shuffle=False)
 
-    print("Final results:")
+    print('Final results:')
 
-    test_mon = monitoring(test_minibatches, "test", val_fn,
+    test_mon = monitoring(test_minibatches, 'test', val_fn,
                           monitor_labels)
-    valid_mon = monitoring(valid_minibatches, "valid", val_fn,
+    valid_mon = monitoring(valid_minibatches, 'valid', val_fn,
                            monitor_labels)
-    train_mon = monitoring(train_minibatches, "train", val_fn,
+    train_mon = monitoring(train_minibatches, 'train', val_fn,
                            monitor_labels)
 
-    save_path = os.path.join(save_path, "results")
+    save_path = os.path.join(save_path, 'results')
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    print ("save_path: {}".format(save_path))
+    print ('save_path: {}'.format(save_path))
 
-    np.savez(save_path+"/errors_" + str(lr_value) + "_" +
+    np.savez(save_path+'/errors_' + str(lr_value) + '_' +
              samp_embedding_source,
-             test_err=test_mon["pred. loss"],
-             valid_err=valid_mon["pred. loss"],
-             train_err=train_mon["pred. loss"],
-             test_acc=test_mon["pred. acc"],
-             valid_acc=valid_mon["pred. acc"],
-             train_acc=train_mon["pred. acc"])
+             test_err=test_mon['pred. loss'],
+             valid_err=valid_mon['pred. loss'],
+             train_err=train_mon['pred. loss'],
+             test_acc=test_mon['pred. acc'],
+             valid_acc=valid_mon['pred. acc'],
+             train_acc=train_mon['pred. acc'])
 
     # And load net weights again later on like this:
     # with np.load('model.npz') as f:
@@ -320,13 +320,13 @@ def main():
                         '-fes',
                         default=None,
                         help='Source for the feature embedding. Either' +
-                             '"predicted" or the name of a file from which' +
+                             ''predicted' or the name of a file from which' +
                              'to load a learned embedding')
     parser.add_argument('-sample_embedding_source',
                         '-ses',
                         default=None,
                         help='Source for the sample embedding. Either' +
-                             '"predicted" or the name of a file from which' +
+                             ''predicted' or the name of a file from which' +
                              'to load a learned embedding')
     parser.add_argument('--num_epochs',
                         '-ne',

@@ -1,4 +1,3 @@
-
 import argparse
 import time
 import os
@@ -15,17 +14,15 @@ import numpy as np
 import theano
 import theano.tensor as T
 
-from DietNetworks.experiments.common import dataset_utils
+from common import dataset_utils
 
 import mainloop_helpers as mlh
 import model_helpers as mh
 
-
-
 # Main program
 def execute(dataset, n_hidden_t_enc, n_hidden_s,
             num_epochs=500, learning_rate=.001, learning_rate_annealing=1.0,
-            gamma=1, lmd=0., disc_nonlinearity="sigmoid", keep_labels=1.0,
+            gamma=1, lmd=0., disc_nonlinearity='sigmoid', keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0,  which_fold=1,
             early_stop_criterion='loss',
             save_path='/Tmp/romerosa/DietNetworks/',
@@ -33,7 +30,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
             dataset_path='/Tmp/carriepl/datasets/', resume=False):
 
     # Load the dataset
-    print("Loading data")
+    print('Loading data')
     x_train, y_train, x_valid, y_valid, x_test, y_test, \
         x_unsup, training_labels = mlh.load_data(
             dataset, dataset_path, None,
@@ -43,8 +40,8 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
 
     # Extract required information from data
     n_samples, n_feats = x_train.shape
-    print("Number of features : ", n_feats)
-    print("Glorot init : ", 2.0 / (n_feats + n_hidden_t_enc[-1]))
+    print('Number of features : ', n_feats)
+    print('Glorot init : ', 2.0 / (n_feats + n_hidden_t_enc[-1]))
     n_targets = y_train.shape[1]
 
     # Set some variables
@@ -57,7 +54,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
                                               learning_rate, 0,
                                               0, early_stop_criterion,
                                               learning_rate_annealing)
-    print("Experiment: " + exp_name)
+    print('Experiment: ' + exp_name)
     save_path = os.path.join(save_path, dataset, exp_name)
     save_copy = os.path.join(save_copy, dataset, exp_name)
     if not os.path.exists(save_path):
@@ -69,7 +66,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     lr = theano.shared(np.float32(learning_rate), 'learning_rate')
 
     # Build model
-    print("Building model")
+    print('Building model')
     discrim_net = InputLayer((None, n_feats), input_var_sup)
     discrim_net = DenseLayer(discrim_net, num_units=n_hidden_t_enc[-1],
                              nonlinearity=rectify)
@@ -87,12 +84,12 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
         discrim_net = DropoutLayer(discrim_net)
         discrim_net = DenseLayer(discrim_net, num_units=hid)
 
-    assert disc_nonlinearity in ["sigmoid", "linear", "rectify", "softmax"]
+    assert disc_nonlinearity in ['sigmoid', 'linear', 'rectify', 'softmax']
     discrim_net = DropoutLayer(discrim_net)
     discrim_net = DenseLayer(discrim_net, num_units=n_targets,
                              nonlinearity=eval(disc_nonlinearity))
 
-    print("Building and compiling training functions")
+    print('Building and compiling training functions')
 
     # Build and compile training functions
     predictions, predictions_det = mh.define_predictions(nets, start=0)
@@ -143,10 +140,10 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
                                on_unused_input='ignore')
 
     # Monitoring Labels
-    monitor_labels = ["reconst. loss"]
+    monitor_labels = ['reconst. loss']
     monitor_labels = [i for i, j in zip(monitor_labels, reconst_losses)
                       if j != 0]
-    monitor_labels += ["loss. sup.", "total loss"]
+    monitor_labels += ['loss. sup.', 'total loss']
 
     # Build and compile test function
     val_outputs = reconst_losses_det
@@ -156,7 +153,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     # Compute accuracy and add it to monitoring list
     test_acc, test_pred = mh.define_test_functions(
         disc_nonlinearity, prediction_sup, prediction_sup_det, target_var_sup)
-    monitor_labels.append("accuracy")
+    monitor_labels.append('accuracy')
     val_outputs.append(test_acc)
 
     # Compile prediction function
@@ -168,7 +165,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
                              on_unused_input='ignore')
 
     # Finally, launch the training loop.
-    print("Starting training...")
+    print('Starting training...')
 
     # Some variables
     max_patience = 100
@@ -179,23 +176,23 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     train_loss = []
 
     # Pre-training monitoring
-    print("Epoch 0 of {}".format(num_epochs))
+    print('Epoch 0 of {}'.format(num_epochs))
 
     train_minibatches = mlh.iterate_minibatches(x_train, y_train,
                                                 batch_size, shuffle=False)
-    train_err = mlh.monitoring(train_minibatches, "train", val_fn, monitor_labels,
+    train_err = mlh.monitoring(train_minibatches, 'train', val_fn, monitor_labels,
                                prec_recall_cutoff)
 
     valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
                                                 batch_size, shuffle=False)
-    valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn, monitor_labels,
+    valid_err = mlh.monitoring(valid_minibatches, 'valid', val_fn, monitor_labels,
                                prec_recall_cutoff)
 
     # Training loop
     start_training = time.time()
     for epoch in range(num_epochs):
         start_time = time.time()
-        print("Epoch {} of {}".format(epoch+1, num_epochs))
+        print('Epoch {} of {}'.format(epoch+1, num_epochs))
         nb_minibatches = 0
         loss_epoch = 0
 
@@ -212,7 +209,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
         # Monitoring on the training set
         train_minibatches = mlh.iterate_minibatches(x_train, y_train,
                                                     batch_size, shuffle=False)
-        train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+        train_err = mlh.monitoring(train_minibatches, 'train', val_fn,
                                    monitor_labels, prec_recall_cutoff)
         train_monitored += [train_err]
 
@@ -220,7 +217,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
         valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
                                                     batch_size, shuffle=False)
 
-        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+        valid_err = mlh.monitoring(valid_minibatches, 'valid', val_fn,
                                    monitor_labels, prec_recall_cutoff)
         valid_monitored += [valid_err]
 
@@ -228,7 +225,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
             early_stop_val = valid_err[
                 monitor_labels.index(early_stop_criterion)]
         except:
-            raise ValueError("There is no monitored value by the name of %s" %
+            raise ValueError('There is no monitored value by the name of %s' %
                              early_stop_criterion)
 
         # Early stopping
@@ -244,23 +241,23 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
             np.savez(os.path.join(save_path, 'model_best.npz'),
                      *lasagne.layers.get_all_param_values(filter(None, nets) +
                                                           [discrim_net]))
-            np.savez(save_path + "/errors_supervised_best.npz",
+            np.savez(save_path + '/errors_supervised_best.npz',
                      zip(*train_monitored), zip(*valid_monitored))
         else:
             patience += 1
             np.savez(os.path.join(save_path, 'model_last.npz'),
                      *lasagne.layers.get_all_param_values(filter(None, nets) +
                                                           [discrim_net]))
-            np.savez(save_path + "/errors_supervised_last.npz",
+            np.savez(save_path + '/errors_supervised_last.npz',
                      zip(*train_monitored), zip(*valid_monitored))
 
         # End training
         if patience == max_patience or epoch == num_epochs-1:
-            print("Ending training")
+            print('Ending training')
             # Load best model
             if not os.path.exists(save_path + '/model_best.npz'):
-                print("No saved model to be tested and/or generate"
-                      " the embedding !")
+                print('No saved model to be tested and/or generate'
+                      ' the embedding !')
             else:
                 with np.load(save_path + '/model_best.npz',) as f:
                     param_values = [f['arr_%d' % i]
@@ -273,14 +270,14 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
             train_minibatches = mlh.iterate_minibatches(x_train, y_train,
                                                         batch_size,
                                                         shuffle=False)
-            train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+            train_err = mlh.monitoring(train_minibatches, 'train', val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Validation set results
             valid_minibatches = mlh.iterate_minibatches(x_valid, y_valid,
                                                         batch_size,
                                                         shuffle=False)
-            valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+            valid_err = mlh.monitoring(valid_minibatches, 'valid', val_fn,
                                        monitor_labels, prec_recall_cutoff)
 
             # Test set results
@@ -289,7 +286,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
                                                            batch_size,
                                                            shuffle=False)
 
-                test_err = mlh.monitoring(test_minibatches, "test", val_fn,
+                test_err = mlh.monitoring(test_minibatches, 'test', val_fn,
                                           monitor_labels, prec_recall_cutoff)
             else:
                 for minibatch in mlh.iterate_testbatches(x_test,
@@ -301,17 +298,17 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
                          test_predictions)
 
             # Stop
-            print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() -
+            print('  epoch time:\t\t\t{:.3f}s \n'.format(time.time() -
                                                          start_time))
             break
 
-        print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() - start_time))
+        print('  epoch time:\t\t\t{:.3f}s \n'.format(time.time() - start_time))
 
         # Anneal the learning rate
         lr.set_value(float(lr.get_value() * learning_rate_annealing))
 
     # Print all final errors for train, validation and test
-    print("Training time:\t\t\t{:.3f}s".format(time.time() - start_training))
+    print('Training time:\t\t\t{:.3f}s'.format(time.time() - start_training))
 
     # Copy files to loadpath
     if save_path != save_copy:
@@ -320,7 +317,7 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="""Train basic model""")
+    parser = argparse.ArgumentParser(description='''Train basic model''')
     parser.add_argument('--dataset',
                         default='1000_genomes',
                         help='Dataset.')
@@ -354,10 +351,10 @@ def main():
                         '-l',
                         type=float,
                         default=0.,
-                        help="""Weight decay coeff.""")
+                        help='''Weight decay coeff.''')
     parser.add_argument('--disc_nonlinearity',
                         '-nl',
-                        default="softmax",
+                        default='softmax',
                         help='Nonlinearity to use in disc_net last layer')
     parser.add_argument('--keep_labels',
                         type=float,
@@ -378,7 +375,7 @@ def main():
                         default= './',
                         help='Path to save results.')
     parser.add_argument('--save_perm',
-                        default='/data/lisatmp4/'+ os.environ["USER"]+'/DietNetworks/',
+                        default='/data/lisatmp4/'+ os.environ['USER']+'/DietNetworks/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
                         default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/',
@@ -389,8 +386,8 @@ def main():
                         help='Whether to resume job')
 
     args = parser.parse_args()
-    print ("Printing args")
-    print (args)
+    print('Printing args')
+    print(vars(args))
 
     execute(args.dataset,
             mlh.parse_int_list_arg(args.n_hidden_t_enc),
@@ -409,7 +406,6 @@ def main():
             args.save_perm,
             args.dataset_path,
             args.resume)
-
 
 if __name__ == '__main__':
     main()

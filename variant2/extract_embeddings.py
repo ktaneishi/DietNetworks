@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-
-from __future__ import print_function
 import argparse
 import time
 import os
@@ -24,7 +21,6 @@ import matplotlib.pyplot as plt
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
 
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,

@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-
-from __future__ import print_function
 import argparse
 import time
 import os
@@ -21,8 +18,6 @@ from DietNetworks.experiments.common import dataset_utils
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
-
 
 # Main program
 def execute(dataset, n_hidden_t_enc, n_hidden_s,
@@ -64,7 +59,6 @@ def execute(dataset, n_hidden_t_enc, n_hidden_s,
     print(save_path)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
 
     # Prepare Theano variables for inputs and targets
     input_var_sup = T.matrix('input_sup')
@@ -285,7 +279,6 @@ def main():
             args.save_path,
             args.resume,
             args.exp_name)
-
 
 if __name__ == '__main__':
     main()

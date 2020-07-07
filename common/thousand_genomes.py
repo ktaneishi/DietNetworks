@@ -7,15 +7,15 @@ def load_data(path="", force_npz_recreation=False):
     genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_A.raw"
     label_file = "../data/affy_samples.20141118.panel"
     
-    if os.path.exists(path + dataset_file) and not force_npz_recreation:
-        genomic_data, label_data = numpy.load(path + dataset_file).values()
+    if os.path.exists(os.path.join(path, dataset_file)) and not force_npz_recreation:
+        genomic_data, label_data = numpy.load(os.path.join(path, dataset_file)).values()
         return genomic_data, label_data
         
     print("No binary .npz file has been found for this dataset. The data will "
           "be parsed to produce one. This will take a few minutes.")
     
     # Load the genomic data file
-    with open(path + genome_file, "r") as f:
+    with open(os.path.join(path, genome_file), "r") as f:
         lines = f.readlines()[1:]
     headers = [l.split()[:6] for l in lines]
     

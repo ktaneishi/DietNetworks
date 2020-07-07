@@ -58,15 +58,12 @@ def prune_splits(splits, nb_prune):
     return [s * normalization_constant for s in splits[:-nb_prune]]
 
 def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
-                      nolabels='raw', fold=0, norm=True,
-                      path=""):
-
-    print(path)
+                      nolabels='raw', fold=0, norm=True, path=''):
 
     if nolabels == 'raw' or not transpose:
         # Load raw data either for supervised or unsupervised part
         x, y = thousand_genomes.load_data(path)
-        x = x.astype("float32")
+        x = x.astype('float32')
 
         (x, y) = shuffle((x, y))  # seed is fixed, shuffle is always the same
 

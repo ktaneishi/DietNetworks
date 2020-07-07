@@ -2,6 +2,7 @@ WGS=ALL.wgs.nhgri_coriell_affy_6.20140825.genotypes_has_ped.vcf.gz
 PANEL=affy_samples.20141118.panel
 PLINK=./plink/plink
 PLINK_SRC=plink_linux_x86_64_20200219.zip
+AUT=affy_6_biallelic_snps_maf005_aut
 TMPDIR=temp
 
 all: download run
@@ -20,17 +21,17 @@ $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A.raw: data/$(WGS)
 	mkdir -p $(TMPDIR)
 	# minor allele frequencies 5%, autosome = without X, Y, MT chromosomes
 	$(PLINK) --vcf data/$(WGS) --maf 0.05 \
-		--out $(TMPDIR)/affy_6_biallelic_snps_maf005_aut --not-chr X Y MT --make-bed
+		--out $(TMPDIR)/$(AUT) --not-chr X Y MT --make-bed
 
 	# prune independent SNPs
-	$(PLINK) --bfile $(TMPDIR)/affy_6_biallelic_snps_maf005_aut --indep-pairwise 50 5 0.5 --out $(TMPDIR)/affy_6_biallelic_snps_maf005_aut
+	$(PLINK) --bfile $(TMPDIR)/$(AUT) --indep-pairwise 50 5 0.5 --out $(TMPDIR)/$(AUT)
 
 	# numerically recode only independent SNPs
-	$(PLINK) --bfile $(TMPDIR)/affy_6_biallelic_snps_maf005_aut --exclude $(TMPDIR)/affy_6_biallelic_snps_maf005_aut.prune.out \
+	$(PLINK) --bfile $(TMPDIR)/$(AUT) --exclude $(TMPDIR)/affy_6_biallelic_snps_maf005_aut.prune.out \
 		--recode A --out $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A
 
 $(TMPDIR)/histo3x26_fold0.npy: $(TMPDIR)/affy_6_biallelic_snps_maf005_thinned_aut_A.raw
-	PYTHONPATH=../ python common/utils_helpers.py $(TMPDIR)/
+	PYTHONPATH=. python common/utils_helpers.py $(TMPDIR)
 
 preprocess: $(TMPDIR)/histo3x26_fold0.npy
 

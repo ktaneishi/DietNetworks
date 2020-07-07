@@ -4,12 +4,9 @@ import os
 
 from common import dataset_utils
 
-def generate_1000_genomes_hist(transpose=False, label_splits=None,
-                               feature_splits=None, fold=0, perclass=False, path = ''):
+def generate_1000_genomes_hist(transpose=False, label_splits=None, feature_splits=None, fold=0, perclass=False, path = ''):
     '''
-    train, valid, test, _ = du.load_1000_genomes(transpose, label_splits,
-                                                 feature_splits, fold,
-                                                 norm=False)
+    train, valid, test, _ = du.load_1000_genomes(transpose, label_splits, feature_splits, fold, norm=False)
     '''
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose,
                                                  label_splits=label_splits,

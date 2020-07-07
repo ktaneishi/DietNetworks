@@ -5,11 +5,9 @@ from distutils.dir_util import copy_tree
 
 import lasagne
 from lasagne.layers import DenseLayer, InputLayer
-from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify,
-                                    leaky_rectify, very_leaky_rectify)
+from lasagne.nonlinearities import sigmoid, softmax, tanh, linear, rectify, leaky_rectify, very_leaky_rectify
 from lasagne.regularization import apply_penalty, l2, l1
-from lasagne.init import (Uniform, GlorotUniform, GlorotNormal, Normal, He,
-                          HeNormal, HeUniform)
+from lasagne.init import Uniform, GlorotUniform, GlorotNormal, Normal, He, HeNormal, HeUniform
 import numpy as np
 import theano
 import theano.tensor as T
@@ -17,11 +15,6 @@ import theano.tensor as T
 import mainloop_helpers as mlh
 import model_helpers as mh
 from mainloop_helpers import parse_string_int_tuple
-
-
-
-
-
 
 # creating data generator
 def data_generator(dataset, batch_size, shuffle=False, noise=0.5):
@@ -42,33 +35,31 @@ def data_generator(dataset, batch_size, shuffle=False, noise=0.5):
 
         nb_SNPs = nb_feats / 2
         snp_mask = np.random.binomial(1, 1-noise,
-                                      (n_in_batch, nb_SNPs)).astype("uint8")
+                                      (n_in_batch, nb_SNPs)).astype('uint8')
         inputs[:, ::2] *= snp_mask
         inputs[:, 1::2] *= snp_mask
 
         yield inputs, reconstruction_targets
 
-
-def convert_initialization(component, nonlinearity="sigmoid"):
+def convert_initialization(component, nonlinearity='sigmoid'):
     # component = init_dic[component_key]
     assert(len(component) == 2)
-    if component[0] == "uniform":
+    if component[0] == 'uniform':
         return Uniform(component[1])
-    elif component[0] == "glorotnormal":
-        if nonlinearity in ["linear", "sigmoid", "tanh"]:
+    elif component[0] == 'glorotnormal':
+        if nonlinearity in ['linear', 'sigmoid', 'tanh']:
             return GlorotNormal(1.)
         else:
-            return GlorotNormal("relu")
-    elif component[0] == "glorotuniform":
-        if nonlinearity in ["linear", "sigmoid", "tanh"]:
+            return GlorotNormal('relu')
+    elif component[0] == 'glorotuniform':
+        if nonlinearity in ['linear', 'sigmoid', 'tanh']:
             return GlorotUniform(1.)
         else:
-            return GlorotUniform("relu")
-    elif component[0] == "normal":
+            return GlorotUniform('relu')
+    elif component[0] == 'normal':
         return Normal(*component[1])
     else:
         raise NotImplementedError()
-
 
 def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
             lmd=0., noise=0.0, encoder_units=[1024, 512, 256],
@@ -77,19 +68,19 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
             num_fully_connected=0, exp_name='', init_args=None):
 
     # Reading dataset
-    print("Loading data")
-    if dataset == "1000_genomes" and which_fold == 1 and False:
+    print('Loading data')
+    if dataset == '1000_genomes' and which_fold == 1 and False:
         x_unsup = mlh.load_data(dataset, dataset_path, None,
                                 which_fold=which_fold, keep_labels=1.0,
                                 missing_labels_val=-1.0,
                                 embedding_input='raw', transpose=False)
         import pdb; pdb.set_trace()
 
-        x_train = np.zeros((x_unsup[0].shape[0], x_unsup[0].shape[1]*2), dtype="int8")
+        x_train = np.zeros((x_unsup[0].shape[0], x_unsup[0].shape[1]*2), dtype='int8')
         x_train[:,::2] = (x_unsup[0] == 2)
         x_train[:,1::2] = (x_unsup[0] >= 1)
 
-        x_valid = np.zeros((x_unsup[2].shape[0], x_unsup[2].shape[1]*2), dtype="int8")
+        x_valid = np.zeros((x_unsup[2].shape[0], x_unsup[2].shape[1]*2), dtype='int8')
         x_valid[:,::2] = (x_unsup[2] == 2)
         x_valid[:,1::2] = (x_unsup[2] >= 1)
     else:
@@ -104,7 +95,7 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
 
     n_features = x_train.shape[1]
 
-    exp_name += "learn_snp2vec_dae_h"
+    exp_name += 'learn_snp2vec_dae_h'
     for e in encoder_units:
         exp_name += ('-' + str(e))
     # exp_name += '_g-' + str(gamma)
@@ -141,7 +132,7 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
     get_embedding_fn = theano.function([input_var], embedding)
 
     params = lasagne.layers.get_all_params(encoder, trainable=True)
-    monitor_labels = ["embedding min", "embedding mean", "embedding max"]
+    monitor_labels = ['embedding min', 'embedding mean', 'embedding max']
     val_outputs = [embedding.min(), embedding.mean(), embedding.max()]
     nets = [encoder]
 
@@ -156,8 +147,8 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
     decoder = DenseLayer(decoder,
                          num_units=n_features,
                          W=convert_initialization(
-                                init_args["decoder_init"],
-                                nonlinearity="sigmoid"),
+                                init_args['decoder_init'],
+                                nonlinearity='sigmoid'),
                          nonlinearity=sigmoid)
     prediction_reconst = lasagne.layers.get_output(decoder)
 
@@ -174,7 +165,7 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
     accuracy = T.eq(T.gt(prediction_reconst, 0.5), target_reconst).mean()
 
     params += lasagne.layers.get_all_params(decoder, trainable=True)
-    monitor_labels += ["reconst. loss", "reconst. accuracy"]
+    monitor_labels += ['reconst. loss', 'reconst. accuracy']
     val_outputs += [loss_reconst, accuracy]
     nets += [decoder]
     # sparsity_reconst = gamma * l1(prediction_reconst)
@@ -200,9 +191,7 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
     valid_monitored = []
     train_loss = []
 
-    updates = lasagne.updates.adam(loss,
-                                   params,
-                                   learning_rate=lr)
+    updates = lasagne.updates.adam(loss, params, learning_rate=lr)
 
     for k in updates.keys():
         if updates[k].ndim == 2:
@@ -211,7 +200,7 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
     inputs = [input_var, target_reconst]
 
     # Compile training function
-    print "Compiling training function"
+    print 'Compiling training function'
     train_fn = theano.function(inputs, loss, updates=updates,
                                on_unused_input='ignore')
     val_fn = theano.function(inputs,
@@ -220,10 +209,10 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
 
     start_training = time.time()
 
-    print "Starting training"
+    print 'Starting training'
     for epoch in range(num_epochs):
         start_time = time.time()
-        print("Epoch {} of {}".format(epoch+1, num_epochs))
+        print('Epoch {} of {}'.format(epoch+1, num_epochs))
         nb_minibatches = 0
         loss_epoch = 0
 
@@ -237,14 +226,14 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
 
         # Monitoring on the training set
         train_minibatches = data_generator(x_train, batch_size, noise=noise)
-        train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+        train_err = mlh.monitoring(train_minibatches, 'train', val_fn,
                                    monitor_labels, 0)
         train_monitored += [train_err]
 
         # Monitoring on the validation set
         valid_minibatches = data_generator(x_valid, batch_size, noise=noise)
 
-        valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+        valid_err = mlh.monitoring(valid_minibatches, 'valid', val_fn,
                                    monitor_labels, 0)
         valid_monitored += [valid_err]
 
@@ -261,22 +250,22 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
             # Save stuff
             np.savez(save_path+'/model_snp2vec_best.npz',
                      *lasagne.layers.get_all_param_values(nets))
-            np.savez(save_path + "/errors_snp2vec_best.npz",
+            np.savez(save_path + '/errors_snp2vec_best.npz',
                      zip(*train_monitored), zip(*valid_monitored))
         else:
             patience += 1
             np.savez(os.path.join(save_path, 'model_snp2vec_last.npz'),
                      *lasagne.layers.get_all_param_values(nets))
-            np.savez(save_path + "/errors_snp2vec_last.npz",
+            np.savez(save_path + '/errors_snp2vec_last.npz',
                      zip(*train_monitored), zip(*valid_monitored))
 
         # End training
         if (patience == max_patience) or (epoch == num_epochs-1):
-            print("Ending training")
+            print('Ending training')
             # Load best model
             if not os.path.exists(save_path + '/model_snp2vec_best.npz'):
-                print("No saved model to be tested and/or generate"
-                      " the embedding !")
+                print('No saved model to be tested and/or generate'
+                      ' the embedding !')
             else:
                 with np.load(save_path + '/model_snp2vec_best.npz') as f:
                     param_values = [f['arr_%d' % i]
@@ -286,15 +275,15 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
             # Use the saved model to generate the feature embedding
             # Here the feature embedding is the different in the hidden
             # representation between having that feature on and having it off
-            print("Generating embedding")
+            print('Generating embedding')
             embedding_size = encoder_units[-1]
-            null_input = np.zeros((1, n_features), dtype="float32")
+            null_input = np.zeros((1, n_features), dtype='float32')
             null_embedding = get_embedding_fn(null_input)[0]
 
             all_embeddings = np.zeros((n_features,
-                                       embedding_size), dtype="float32")
+                                       embedding_size), dtype='float32')
 
-            """
+            '''
             single_feat_input = null_input.copy()
             for i in range(n_features):
                 if i % 10000 == 0:
@@ -306,10 +295,10 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
                 single_feat_input[:,i] = 0
 
             result1 = all_embeddings[:1000].copy()
-            """
+            '''
 
             block_size = 10
-            single_feat_batch = np.zeros((block_size, n_features), dtype="float32")
+            single_feat_batch = np.zeros((block_size, n_features), dtype='float32')
             for i in range(0, n_features, block_size):
                 if i % 10000 == 0:
                     print(i, n_features)
@@ -323,37 +312,35 @@ def execute(dataset, learning_rate=0.00001, learning_rate_annealing=1.0,
                 for j in range(block_size):
                     single_feat_batch[j, i+j] = 0
 
-            np.save("/Tmp/carriepl/DietNetworks/all_embeddings_noise%f_fold%i.npy" % (which_fold, noise),
+            np.save('/Tmp/carriepl/DietNetworks/all_embeddings_noise%f_fold%i.npy' % (which_fold, noise),
                     all_embeddings)
 
             # Training set results
             train_minibatches = data_generator(x_train, batch_size, noise=noise)
-            train_err = mlh.monitoring(train_minibatches, "train", val_fn,
+            train_err = mlh.monitoring(train_minibatches, 'train', val_fn,
                                        monitor_labels, 0)
 
             # Validation set results
             valid_minibatches = data_generator(x_valid, batch_size, noise=noise)
-            valid_err = mlh.monitoring(valid_minibatches, "valid", val_fn,
+            valid_err = mlh.monitoring(valid_minibatches, 'valid', val_fn,
                                        monitor_labels, 0)
 
             # Stop
-            print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() -
+            print('  epoch time:\t\t\t{:.3f}s \n'.format(time.time() -
                                                          start_time))
             break
 
-        print("  epoch time:\t\t\t{:.3f}s \n".format(time.time() - start_time))
+        print('  epoch time:\t\t\t{:.3f}s \n'.format(time.time() - start_time))
         # Anneal the learning rate
         lr.set_value(float(lr.get_value() * learning_rate_annealing))
-
 
     # Copy files to loadpath
     if save_path != save_copy:
         print('Copying model and other training files to {}'.format(save_copy))
         copy_tree(save_path, save_copy)
 
-
 def main():
-    parser = argparse.ArgumentParser(description="""Train snp2vec embedding.""")
+    parser = argparse.ArgumentParser(description='''Train snp2vec embedding.''')
     parser.add_argument('--dataset',
                         default='1000_genomes',
                         help='Dataset.')
@@ -361,41 +348,41 @@ def main():
                         '-lr',
                         type=float,
                         default=.001,
-                        help="""Float to indicate learning rate.""")
+                        help='''Float to indicate learning rate.''')
     parser.add_argument('--learning_rate_annealing',
                         '-lra',
                         type=float,
                         default=.99,
-                        help="Float to indicate learning rate annealing rate.")
+                        help='Float to indicate learning rate annealing rate.')
     parser.add_argument('--lmd',
                         '-l',
                         type=float,
                         default=.0,
-                        help="""Float to indicate weight decay coeff.""")
+                        help='''Float to indicate weight decay coeff.''')
     parser.add_argument('--noise',
                         type=float,
                         default=.25,
-                        help="Float to indicate fraction of inputs to blackout.")
+                        help='Float to indicate fraction of inputs to blackout.')
     # parser.add_argument('--gamma',
     #                     '-g',
     #                     type=float,
     #                     default=.0005,
-    #                     help="""Float to indicate l1 penalty.""")
+    #                     help='''Float to indicate l1 penalty.''')
     parser.add_argument('--encoder_init',
                         '-eni',
-                        default=("uniform",0.01),
-                        help="Initialization for " +
-                             "encoder_net weights")
+                        default=('uniform',0.01),
+                        help='Initialization for ' +
+                             'encoder_net weights')
     parser.add_argument('--decoder_init',
                         '-dei',
                         default=['glorotnormal', 1.0],
-                        help="Initialization for " +
-                             "decoder_net weights")
+                        help='Initialization for ' +
+                             'decoder_net weights')
     parser.add_argument('--predictor_init',
                         '-pri',
                         default=['glorotnormal', 1.0],
-                        help="Initialization for " +
-                             "predictor_net weights")
+                        help='Initialization for ' +
+                             'predictor_net weights')
     parser.add_argument('--encoder_units',
                         default=[100, 100],
                         help='List of encoder hidden units.')
@@ -403,18 +390,18 @@ def main():
                         '-ne',
                         type=int,
                         default=1000,
-                        help="""Int to indicate the max'
-                        'number of epochs.""")
+                        help='''Int to indicate the max'
+                        'number of epochs.''')
     parser.add_argument('--which_fold',
                         type=int,
                         default=0,
                         help='Which fold to use for cross-validation (0-4)')
     parser.add_argument('--save_tmp',
-                        default='/Tmp/'+os.environ["USER"] +
+                        default='/Tmp/'+os.environ['USER'] +
                                 '/DietNetworks/',
                         help='Path to save results.')
     parser.add_argument('--save_perm',
-                        default='/data/lisatmp4/'+os.environ["USER"] +
+                        default='/data/lisatmp4/'+os.environ['USER'] +
                                 '/DietNetworks/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
@@ -432,13 +419,12 @@ def main():
 
     args = parser.parse_args()
 
+    init_args = {'encoder_init' : parse_string_int_tuple(args.encoder_init),
+                 'decoder_init' : parse_string_int_tuple(args.decoder_init),
+                 'predictor_init' : parse_string_int_tuple(args.predictor_init)}
 
-    init_args = {"encoder_init" : parse_string_int_tuple(args.encoder_init),
-                 "decoder_init" : parse_string_int_tuple(args.decoder_init),
-                 "predictor_init" : parse_string_int_tuple(args.predictor_init)}
-
-    print args
-    print "init_args: {}".format(init_args)
+    print(vars(args))
+    print('init_args: {}'.format(init_args))
 
     execute(args.dataset,
             args.learning_rate,
@@ -456,7 +442,6 @@ def main():
             args.num_fully_connected,
             args.exp_name,
             init_args)
-
 
 if __name__ == '__main__':
     main()

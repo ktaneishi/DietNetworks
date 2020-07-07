@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import os
 
 from common import thousand_genomes
@@ -9,9 +9,9 @@ def shuffle(data_sources, seed=23):
     correspondance between data sources (such as inputs and targets) is
     maintained.
     '''
-    numpy.random.seed(seed)
-    indices = numpy.arange(data_sources[0].shape[0])
-    numpy.random.shuffle(indices)
+    np.random.seed(seed)
+    indices = np.arange(data_sources[0].shape[0])
+    np.random.shuffle(indices)
 
     return [d[indices] for d in data_sources]
 
@@ -79,8 +79,8 @@ def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
         test = all_folds[fold]
         all_folds = all_folds[:fold] + all_folds[(fold + 1):]
 
-        x = numpy.concatenate([el[0] for el in all_folds])
-        y = numpy.concatenate([el[1] for el in all_folds])
+        x = np.concatenate([el[0] for el in all_folds])
+        y = np.concatenate([el[1] for el in all_folds])
 
     # Data used for supervised training
     if not transpose:
@@ -101,16 +101,16 @@ def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
     elif nolabels == 'raw' and transpose:
         unsupervised_data = x.transpose()
     elif nolabels == 'histo3':
-        unsupervised_data = numpy.load(os.path.join(path, 'histo3_fold%d.npy' % fold))
+        unsupervised_data = np.load(os.path.join(path, 'histo3_fold%d.npy' % fold))
     elif nolabels == 'histo3x26':
-        unsupervised_data = numpy.load(os.path.join(path, 'histo3x26_fold%d.npy' % fold))
+        unsupervised_data = np.load(os.path.join(path, 'histo3x26_fold%d.npy' % fold))
     elif nolabels == 'bin':
-        unsupervised_data = numpy.load(os.path.join(path, 'snp_bin_fold%d.npy' % fold))
+        unsupervised_data = np.load(os.path.join(path, 'snp_bin_fold%d.npy' % fold))
     elif nolabels == 'w2v':
         raise NotImplementedError
     else:
         try:
-            unsupervised_data = numpy.load(nolabels)
+            unsupervised_data = np.load(nolabels)
         except:
             raise ValueError('Could not load specified embedding source')
 

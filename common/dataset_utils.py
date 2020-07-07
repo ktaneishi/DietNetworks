@@ -1,37 +1,28 @@
 import numpy
 import os
-"""
-from DietNetworks.experiments.common import (protein_loader, dorothea,
-                                                  reuters, imdb, iric_molecules,
-                                                  thousand_genomes)
-"""
-from DietNetworks.experiments.common import thousand_genomes
 
-
+from DietNetworks.common import thousand_genomes
 
 def shuffle(data_sources, seed=23):
-    """
+    '''
     Shuffles multiple data sources (numpy arrays) together so the
     correspondance between data sources (such as inputs and targets) is
     maintained.
-    """
-
+    '''
     numpy.random.seed(seed)
     indices = numpy.arange(data_sources[0].shape[0])
     numpy.random.shuffle(indices)
 
     return [d[indices] for d in data_sources]
 
-
 def split(data_sources, splits):
-    """
+    '''
     Splits the given data sources (numpy arrays) according to the provided
     split boundries.
-
     Ex : if splits is [0.6], every data source will be separated in two parts,
     the first containing 60% of the data and the other containing the
     remaining 40%.
-    """
+    '''
 
     if splits is None:
         return data_sources
@@ -49,9 +40,8 @@ def split(data_sources, splits):
 
     return split_data_sources
 
-
 def prune_splits(splits, nb_prune):
-    """
+    '''
     Takes as input a list of split points in a dataset and produces a new list
     where the last split has been removed and the other splits are expanded
     to encompass the whole data but keeping the same proportions.
@@ -60,13 +50,12 @@ def prune_splits(splits, nb_prune):
          with nb_prune=1, the method would return [0.75] which corresponds to
          2 splits : 75% and 25%. Hence, the proportions between the remaining
          splits remain the same.
-    """
+    '''
     if nb_prune > 1:
         normalization_constant = (1.0 / sum(splits[:-(nb_prune-1)]))
     else:
         normalization_constant = 1.0 / sum(splits)
     return [s * normalization_constant for s in splits[:-nb_prune]]
-
 
 def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
                       nolabels='raw', fold=0, norm=True,

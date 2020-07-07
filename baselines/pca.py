@@ -51,18 +51,11 @@ def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
                      x_test_supervised=new_x_test_supervised[:, :n_comp],
                      y_test_supervised=y_test)
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""PCA embedding""")
 
-    parser.add_argument('-d',
-                        type=str,
-                        default="1000_genomes",
-                        help='dataset')
-    parser.add_argument('-save_path',
-                        '-sp',
-                        default='',
-                        help='number of components for embedding')
+    parser.add_argument('-d', type=str, default="1000_genomes", help='dataset')
+    parser.add_argument('-save_path', '-sp', default='', help='number of components for embedding')
 
     args = parser.parse_args()
 

@@ -1,18 +1,15 @@
 import os
 import numpy as np
 from DietNetworks.experiments.common import dataset_utils
-
 import sys
 
 def generate_1000_genomes_hist(transpose=False, label_splits=None,
-                               feature_splits=None, fold=0, perclass=False,
-                               path = ''):
-
-    """
+                               feature_splits=None, fold=0, perclass=False, path = ''):
+    '''
     train, valid, test, _ = du.load_1000_genomes(transpose, label_splits,
                                                  feature_splits, fold,
                                                  norm=False)
-    """
+    '''
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose,
                                                  label_splits=label_splits,
                                                  feature_splits=feature_splits,
@@ -83,7 +80,6 @@ def generate_1000_genomes_bag_of_genes(
     nolabel_x[mod1] += 1
     nolabel_x[mod2] += 1
 
-
 def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
                                   feature_splits=None, fold=0,
                                   path = ''):
@@ -103,7 +99,6 @@ def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
     nolabel_x[:, 1::2] += (nolabel_orig >= 1)
 
     np.save(os.path.join(path, filename), nolabel_x)
-
 
 if __name__ == '__main__':
     nfold = 5

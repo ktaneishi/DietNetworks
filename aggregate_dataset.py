@@ -1,8 +1,5 @@
-import os
 import numpy as np
-# import pandas as pd
-import gc
-
+import os
 
 def list_files(data_dir):
     def aux_fitbit(s):
@@ -43,7 +40,6 @@ def list_files(data_dir):
 
     return data
 
-
 def parse_illumina(filename):
     l = []
     with open(filename, "r") as input_file:
@@ -54,7 +50,6 @@ def parse_illumina(filename):
 
             l.append(temp)
     return l[1:]
-
 
 def parse_23_and_me(filename):
     l = []
@@ -70,7 +65,6 @@ def parse_23_and_me(filename):
                 l.append([temp[0], temp[3]])
     return l
 
-
 def parse_list(l):
     d = {}
     for i in l:
@@ -80,14 +74,12 @@ def parse_list(l):
             d[i[0]] = i[1]
     return d
 
-
 def add_dicts_validate(dict1, dict2):
     for k in dict2.keys():
         if k in dict1:
             assert dict1[k] == dict2[k]
         else:
             dict1[k] = dict2[k]
-
 
 def parse_23_and_me_dict(filename, feature_values_dict):
     d = {}
@@ -105,7 +97,6 @@ def parse_23_and_me_dict(filename, feature_values_dict):
                     d[temp[0]] = feature_values_dict[temp[3]]
     return d
 
-
 def categorize_features_for_batch(batch):
     size_batch, n_feat = batch.shape
     batch_categ = np.zeros((size_batch, 20*n_feat))
@@ -115,12 +106,8 @@ def categorize_features_for_batch(batch):
     batch_categ[slice_row_idx, slice_column_idx] = 1
     return batch_categ
 
-
-def load_data23andme(data_path='/data/lisatmp4/erraqabi', split=[.6, .2, .2],
-                     shuffle=False, seed=32):
-    '''
-     splitting dataset
-    '''
+def load_data23andme(data_path='/data/lisatmp4/erraqabi', split=[.6, .2, .2], shuffle=False, seed=32):
+    # splitting dataset
 
     np.random.seed(seed)
     data = np.load(data_path+'/ma_dataset.npy')
@@ -163,13 +150,8 @@ def load_data23andme(data_path='/data/lisatmp4/erraqabi', split=[.6, .2, .2],
             supervised_train_data, supervised_val_data, supervised_test_data,
             supervised_train_labels, supervised_val_labels, supervised_test_labels)
 
-
-def load_data23andme_baselines(data_path='/data/lisatmp4/carriepl',
-                               shuffle=False, seed=32, split=.8):
-
-    '''
-    Splitting dataset
-    '''
+def load_data23andme_baselines(data_path='/data/lisatmp4/carriepl', shuffle=False, seed=32, split=.8):
+    # Splitting dataset
     # Load data
     np.random.seed(seed)
 
@@ -270,7 +252,6 @@ if __name__ == "__main__":
                     height_data23andme[user_id] = -1
         except:
             print("Skipping user", user_id)
-        gc.collect()
         # if index == 10:
         #     break
 

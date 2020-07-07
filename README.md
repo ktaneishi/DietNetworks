@@ -9,7 +9,7 @@ This repo contains the code to reproduce the experiments of the paper [DietNetwo
 
 ## Generate the pre-computed embeddings if necessary
 
-cd experiments/common
+cd common
 python utils_helpers.py 
 
 By default, this generates the histogram per class embeddings. You will need to change the path argument.
@@ -18,7 +18,7 @@ By default, this generates the histogram per class embeddings. You will need to 
 
 #### Diet Networks with per class histograms (fold 0)
 
-cd experiments/variant2
+cd variant2
 
 Experiments without reconstruction loss:
 
@@ -31,7 +31,7 @@ THEANO_FLAGS='device=gpu' python learn_model.py --which_fold=0 -eni=0.02 -dni=0.
 
 ![Result](https://raw.githubusercontent.com/taneishi/DietNetworks/master/DietNetworks.png)
 
-#### Parameters in experiments/variant2/learn_model.py
+#### Parameters in variant2/learn_model.py
 - dataset: Str. Dataset name. (default: '1000_genomes').
 - n_hidden_u: List. Considering the Emb. of Fig. 1 (b)/(c) an MLP -> number of hidden units of each layer of the MLP. The parameters of the embedding are shared among auxiliary networks in Fig. 1 (b) and (c). **Set to [100] for DietNetworks experiments, ignored when a particuler embedding is required.**
 - n_hidden_t_enc/dec: List. Number of hidden units of the MLP depicted in Fig. 1 (b)/(c). Both MLP have the same structure (number of layers, number of hidden units per layer) but do not share parameters. **Set to [100, 100] for DietNetworks experiments.**

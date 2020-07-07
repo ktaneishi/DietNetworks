@@ -1,4 +1,4 @@
-"""
+'''
 Module for supervised learning.
 
 This module should only be used when already having an embedding for the
@@ -7,10 +7,7 @@ For getting an embedding of the features, see for instance
 featsel_unsupervised.py
 For getting an embedding of the data, see for instance
 benchmark/pca.py or benchmark/kmeans.py
-
-"""
-from __future__ import print_function
-
+'''
 import sys
 import argparse
 import time
@@ -24,10 +21,8 @@ import theano.tensor as T
 
 from lasagne.nonlinearities import sigmoid, softmax
 
-
-
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
-    """Generate the minibatches for learning."""
+    '''Generate the minibatches for learning.'''
 
     assert len(inputs) == len(targets)
     if shuffle:
@@ -42,12 +37,10 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
         yield inputs[excerpt], targets[excerpt]
 
-
 def onehot_labels(labels, min_val, max_val):
     output = np.zeros((len(labels), max_val - min_val + 1), dtype="int32")
     output[np.arange(len(labels)), labels - min_val] = 1
     return output
-
 
 def generate_test_predictions(minibatches, pred_fn):
 
@@ -75,7 +68,6 @@ def generate_test_predictions(minibatches, pred_fn):
     with open(filename_prob, "w") as f:
         f.write(",".join([str(p) for p in all_probabilities]))
 
-
 def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
     monitoring_values = np.zeros(len(monitoring_labels), dtype="float32")
@@ -98,12 +90,11 @@ def monitoring(minibatches, dataset_name, val_fn, monitoring_labels):
 
     return monitoring_dict
 
-
 # Main program
 def execute(samp_embedding_source, num_epochs=500,
             lr_value=1e-5, n_classes=1,
             save_path='/data/lisatmp4/dejoieti/DietNetworks/'):
-    """
+    '''
     Execute a supervised learning.
 
     This function execute a suprevised learning using a embedding
@@ -117,7 +108,7 @@ def execute(samp_embedding_source, num_epochs=500,
     :param sample_embedding_source: if you want to choose directly an embedding
     of the data, you should provide the path of the npz file from save_path
     ('/data/lisatmp4/dejoieti/DietNetworks/')
-    """
+    '''
 
     # Load the dataset
     print("Loading data")
@@ -319,10 +310,9 @@ def execute(samp_embedding_source, num_epochs=500,
     #     param_values = [f['arr_%d' % i] for i in range(len(f.files))]
     # lasagne.layers.set_all_param_values(network, param_values)
 
-
 def main():
-    """Run execute with the accurate arguments."""
-    parser = argparse.ArgumentParser(description="""Train baseline from embedding.""")
+    '''Run execute with the accurate arguments.'''
+    parser = argparse.ArgumentParser(description='''Train baseline from embedding.''')
     parser.add_argument('-dataset',
                         default='1000_genomes',
                         help='Dataset.')
@@ -342,14 +332,13 @@ def main():
                         '-ne',
                         type=int,
                         default=5,
-                        help="""Optional. Int to indicate the max'
-                        'number of epochs.""")
+                        help='''Optional. Int to indicate the max'
+                        'number of epochs.''')
 
     args = parser.parse_args()
 
     execute(args.dataset, args.feat_embedding_source,
             args.sample_embedding_source, int(args.num_epochs))
-
 
 if __name__ == '__main__':
     main()

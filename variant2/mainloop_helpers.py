@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import random
-from DietNetworks.experiments.common import dataset_utils
+from DietNetworks.common import dataset_utils
 
 # Function to load data
 def load_data(dataset, dataset_path, embedding_source,

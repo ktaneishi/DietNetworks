@@ -1,6 +1,5 @@
 import numpy
 
-
 snp_to_int = {'A': 1, 'AA': 2, 'AC': 3, 'AG': 4, 'AT': 5,
               'C': 6, 'CC': 7, 'CG': 8, 'CT': 9, 'D': 10,
               'DD': 11, 'DI': 12, 'G': 13, 'GG': 14,
@@ -11,7 +10,6 @@ int_to_snp = dict(zip(snp_to_int.values(), snp_to_int.keys()))
 
 def replace_inplace(arr, to_replace, replace_with):
     arr += (arr == to_replace) * (replace_with - to_replace)
-    
 
 def trim_dataset():
     
@@ -37,7 +35,6 @@ def trim_dataset():
                 
     n_data = o_data[:,features_to_keep]
     
-    
     # Step 2 : Replace any single-letter SNP by the double letter equivalent
     print("Step 2")
     
@@ -48,7 +45,6 @@ def trim_dataset():
     numpy.place(n_data, n_data == snp_to_int['I'], snp_to_int['II'])
     numpy.place(n_data, n_data == snp_to_int['T'], snp_to_int['TT'])
     
-
     # Step 3 : Change the feature's representation from categories to additive
     # coding.
     print("Step 3")
@@ -96,7 +92,6 @@ def trim_dataset():
     print("Saving to disk")
     
     numpy.save('/data/lisatmp4/carriepl/ma_dataset_trimmed.npy', n_data)
-    
     
 if __name__ == "__main__":
     trim_dataset()

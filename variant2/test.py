@@ -1,5 +1,3 @@
-
-from __future__ import print_function
 import argparse
 import time
 import os
@@ -17,13 +15,12 @@ import numpy as np
 import theano
 import theano.tensor as T
 
-from DietNetworks.experiments.common import dataset_utils
+from common import dataset_utils
 
 import matplotlib.pyplot as plt
 
 import mainloop_helpers as mlh
 import model_helpers as mh
-
 
 # Main program
 def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
@@ -44,7 +41,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         embedding_source = os.path.join(dataset_path, embedding_input + '_fold' + str(which_fold) + '.npy')
 
     # Load the dataset
-    print("Loading data")
+    print('Loading data')
     x_train, y_train, x_valid, y_valid, x_test, y_test, \
         x_unsup, training_labels = mlh.load_data(
             dataset, dataset_path, embedding_source,
@@ -59,8 +56,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
     # Extract required information from data
     n_samples, n_feats = x_train.shape
-    print("Number of features : ", n_feats)
-    print("Glorot init : ", 2.0 / (n_feats + n_hidden_t_enc[-1]))
+    print('Number of features : ', n_feats)
+    print('Glorot init : ', 2.0 / (n_feats + n_hidden_t_enc[-1]))
     n_targets = y_train.shape[1]
 
     # Set some variables
@@ -71,7 +68,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     if embedding_source is None:
         embedding_name = embedding_input
     else:
-        embedding_name = embedding_source.replace("_", "").split(".")[0]
+        embedding_name = embedding_source.replace('_', '').split('.')[0]
         exp_name += embedding_name.rsplit('/', 1)[::-1][0] + '_'
 
     exp_name += mlh.define_exp_name(keep_labels, alpha, beta, gamma, lmd,
@@ -81,7 +78,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
                                     encoder_net_init, early_stop_criterion,
                                     learning_rate_annealing)
 
-    print("Experiment: " + exp_name)
+    print('Experiment: ' + exp_name)
     save_path = os.path.join(save_path, dataset, exp_name)
     print(save_path)
     if not os.path.exists(save_path):
@@ -93,7 +90,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     target_var_sup = T.matrix('target_sup')
 
     # Build model
-    print("Building model")
+    print('Building model')
 
     # Some checkings
     # assert len(n_hidden_u) > 0
@@ -132,7 +129,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
                                         [discrim_net],
                                         param_values)
 
-    print("Building and compiling functions")
+    print('Building and compiling functions')
 
     # Build functions
     predictions, predictions_det = mh.define_predictions(nets, start=2)
@@ -165,15 +162,15 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     loss_det = loss_det + lmd*l2_penalty
 
     # Monitoring Labels
-    monitor_labels = ["reconst. feat. W_enc",
-                      "reconst. feat. W_dec",
-                      "reconst. loss"]
+    monitor_labels = ['reconst. feat. W_enc',
+                      'reconst. feat. W_dec',
+                      'reconst. loss']
     monitor_labels = [i for i, j in zip(monitor_labels, reconst_losses_det)
                       if j != 0]
-    monitor_labels += ["feat. W_enc. mean", "feat. W_enc var"]
-    monitor_labels += ["feat. W_dec. mean", "feat. W_dec var"] if \
+    monitor_labels += ['feat. W_enc. mean', 'feat. W_enc var']
+    monitor_labels += ['feat. W_dec. mean', 'feat. W_dec var'] if \
         (embeddings[1] is not None) else []
-    monitor_labels += ["loss. sup.", "total loss"]
+    monitor_labels += ['loss. sup.', 'total loss']
 
     # test function
     val_outputs = reconst_losses_det
@@ -186,7 +183,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
     # Compute accuracy and add it to monitoring list
     test_acc, test_pred = mh.define_test_functions(
         disc_nonlinearity, prediction_sup, prediction_sup_det, target_var_sup)
-    monitor_labels.append("accuracy")
+    monitor_labels.append('accuracy')
     val_outputs.append(test_acc)
 
     # Compile prediction function
@@ -199,10 +196,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
 
     # Finally, launch the test loop.
-    print("Starting testing...")
+    print('Starting testing...')
     test_minibatches = mlh.iterate_minibatches(x_test, y_test, batch_size,
                                                shuffle=False)
-    test_err, pred, targets = mlh.monitoring(test_minibatches, "test", val_fn,
+    test_err, pred, targets = mlh.monitoring(test_minibatches, 'test', val_fn,
                                              monitor_labels, prec_recall_cutoff,
                                              return_pred=True)
 
@@ -240,7 +237,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
 
 def main():
-    parser = argparse.ArgumentParser(description="""Test Diet Networks""")
+    parser = argparse.ArgumentParser(description='''Test Diet Networks''')
     parser.add_argument('--dataset',
                         default='1000_genomes',
                         help='Dataset.')
@@ -260,12 +257,12 @@ def main():
                         '-lr',
                         type=float,
                         default=0.00003,
-                        help="""Float to indicate learning rate.""")
+                        help='''Float to indicate learning rate.''')
     parser.add_argument('--learning_rate_annealing',
                         '-lra',
                         type=float,
                         default=.999,
-                        help="Float to indicate learning rate annealing rate.")
+                        help='Float to indicate learning rate annealing rate.')
     parser.add_argument('--embedding_source',
                         default='histo3x26',
                         help='Source for the feature embedding. Either' +
@@ -275,43 +272,43 @@ def main():
                         '-a',
                         type=float,
                         default=0.,
-                        help="""reconst_loss coeff. for auxiliary net W_enc""")
+                        help='''reconst_loss coeff. for auxiliary net W_enc''')
     parser.add_argument('--beta',
                         '-b',
                         type=float,
                         default=0.,
-                        help="""reconst_loss coeff. for auxiliary net W_dec""")
+                        help='''reconst_loss coeff. for auxiliary net W_dec''')
     parser.add_argument('--gamma',
                         '-g',
                         type=float,
                         default=20.0,
-                        help="""reconst_loss coeff. (used for aux net W-dec as well)""")
+                        help='''reconst_loss coeff. (used for aux net W-dec as well)''')
     parser.add_argument('--lmd',
                         '-l',
                         type=float,
                         default=.0,
-                        help="""Weight decay coeff.""")
+                        help='''Weight decay coeff.''')
     parser.add_argument('--encoder_net_init',
                         '-eni',
                         type=float,
                         default=0.02,
-                        help="Bounds of uniform initialization for " +
-                             "encoder_net weights")
+                        help='Bounds of uniform initialization for ' +
+                             'encoder_net weights')
     parser.add_argument('--decoder_net_init',
                         '-dni',
                         type=float,
                         default=0.02,
-                        help="Bounds of uniform initialization for " +
-                             "decoder_net weights")
+                        help='Bounds of uniform initialization for ' +
+                             'decoder_net weights')
     parser.add_argument('--disc_nonlinearity',
                         '-nl',
-                        default="softmax",
-                        help="""Nonlinearity to use in disc_net's last layer""")
+                        default='softmax',
+                        help='''Nonlinearity to use in disc_net's last layer''')
     parser.add_argument('--batchnorm',
                         '-bn',
                         type=int,
                         default=1,
-                        help="Whether to use BatchNorm in the main network")
+                        help='Whether to use BatchNorm in the main network')
     parser.add_argument('--keep_labels',
                         type=float,
                         default=1.0,
@@ -325,7 +322,7 @@ def main():
                         default='accuracy',
                         help='What monitored variable to use for early-stopping')
     parser.add_argument('--save_path',
-                        default='/data/lisatmp4/'+ os.environ["USER"]+'/DietNetworks/',
+                        default='/data/lisatmp4/'+ os.environ['USER']+'/DietNetworks/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
                         default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/',
@@ -340,7 +337,7 @@ def main():
                         help='Experiment name that will be concatenated at the beginning of the generated name')
 
     args = parser.parse_args()
-    print ("Printing args")
+    print ('Printing args')
     print (args)
 
     for f in range(5):

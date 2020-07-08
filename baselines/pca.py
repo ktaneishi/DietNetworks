@@ -1,17 +1,15 @@
-from sklearn.decomposition import RandomizedPCA, TruncatedSVD, PCA
-from DietNetworks.experiments.common import dataset_utils
-from DietNetworks.experiments.variant2 import mainloop_helpers as mlh
-
-import argparse
-import os
 import numpy as np
+import argparse
 import time
+import os
 
-def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
-        dataset_path = ''):
+from sklearn.decomposition import RandomizedPCA, TruncatedSVD, PCA
+from common import dataset_utils
+from variant2 import mainloop_helpers as mlh
 
+def pca(dataset, n_comp_list, save_path, method='pca', which_fold=0, dataset_path = ''):
     # Load the dataset
-    print("Loading data")
+    print('Loading data')
     x_train, y_train, x_valid, y_valid, x_test, y_test, \
         _, _ = mlh.load_data(
             dataset, dataset_path, None,
@@ -25,8 +23,8 @@ def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    if method == "pca":
-        print "Applying PCA"
+    if method == 'pca':
+        print 'Applying PCA'
         # Extract PCA from unsupervised data
         pca = PCA()
         pca.fit(unsupervised)
@@ -40,7 +38,7 @@ def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
         n_comp_possible = [el for el in n_comp_list if el < max_n_comp]
         n_comp_list = n_comp_possible + [max_n_comp]
 
-        print "Saving embeddings"
+        print 'Saving embeddings'
         for n_comp in n_comp_list:
             file_name = save_path + '/pca_' + str(n_comp) + '_embedding_fold' + str(which_fold) + '.npz'
             np.savez(file_name,
@@ -52,11 +50,9 @@ def pca(dataset, n_comp_list, save_path, method="pca", which_fold=0,
                      y_test_supervised=y_test)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="""PCA embedding""")
-
-    parser.add_argument('-d', type=str, default="1000_genomes", help='dataset')
+    parser = argparse.ArgumentParser(description='''PCA embedding''')
+    parser.add_argument('-d', type=str, default='1000_genomes', help='dataset')
     parser.add_argument('-save_path', '-sp', default='', help='number of components for embedding')
-
     args = parser.parse_args()
 
     for f in range(5):

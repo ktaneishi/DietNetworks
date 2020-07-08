@@ -1,24 +1,20 @@
+import numpy as np
+import matplotlib.pyplot as plt
 import argparse
+import random
 import time
 import os
-import random
 from distutils.dir_util import copy_tree
 
 import lasagne
 from lasagne.layers import DenseLayer, InputLayer, DropoutLayer, BatchNormLayer
-from lasagne.nonlinearities import (sigmoid, softmax, tanh, linear, rectify,
-                                    leaky_rectify, very_leaky_rectify)
+from lasagne.nonlinearities import sigmoid, softmax, tanh, linear, rectify, leaky_rectify, very_leaky_rectify
 from lasagne.regularization import apply_penalty, l2
-
 from lasagne.init import Uniform
-import numpy as np
 import theano
 import theano.tensor as T
 
-from DietNetworks.experiments.common import dataset_utils
-
-import matplotlib.pyplot as plt
-
+from common import dataset_utils
 import mainloop_helpers as mlh
 import model_helpers as mh
 
@@ -177,10 +173,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         for i, el in enumerate(all_pred):
             file_name = os.path.join(save_path, 'layer'+str(i)+'_'+which_set+'.npz')
             print(file_name)
-            np.savez(file_name,
-                     representation=el,
-                     label=y.argmax(1))
-
+            np.savez(file_name, representation=el, label=y.argmax(1))
 
 def main():
     parser = argparse.ArgumentParser(description="""Extract embeddings""")
@@ -309,7 +302,6 @@ def main():
                 args.model_path,
                 args.save_path,
                 args.dataset_path)
-
 
 if __name__ == '__main__':
     main()

@@ -26,8 +26,7 @@ def load_data(dataset, dataset_path, embedding_source,
         return
 
     if not transpose:
-        (x_train, y_train), (x_valid, y_valid), (x_test, y_test),\
-            x_nolabel = data
+        (x_train, y_train), (x_valid, y_valid), (x_test, y_test), x_nolabel = data
     else:
         return data
 
@@ -190,8 +189,7 @@ def parse_int_list_arg(arg):
     if isinstance(arg, int):
         return [arg]
     else:
-        raise ValueError('Following arg value could not be cast as a list of'
-                         'integer values : ' % arg)
+        raise ValueError('Following arg value could not be cast as a list of integer values : ' % arg)
 
 def parse_string_int_tuple(arg):
     if isinstance(arg, (list, tuple)):

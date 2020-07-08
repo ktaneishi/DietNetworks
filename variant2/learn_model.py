@@ -13,18 +13,37 @@ import mainloop_helpers as mlh
 import model_helpers as mh
 
 # Main program
-def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
-            embedding_source=None,
-            num_epochs=500, learning_rate=.001, learning_rate_annealing=0.999,
-            alpha=1, beta=1, gamma=1, lmd=.0001, disc_nonlinearity='sigmoid',
-            encoder_net_init=0.2, decoder_net_init=0.2, optimizer='rmsprop',
-            max_patience=100, batchnorm=0, keep_labels=1.0,
-            prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
-            early_stop_criterion='loss_sup_det',
-            save_path='./',
-            save_copy='./',
-            dataset_path='./',
-            resume=False, exp_name='', random_proj=0):
+def execute(args):
+    dataset = args.dataset
+    n_hidden_u = mlh.parse_int_list_arg(args.n_hidden_u)
+    n_hidden_t_enc = mlh.parse_int_list_arg(args.n_hidden_t_enc)
+    n_hidden_t_dec = mlh.parse_int_list_arg(args.n_hidden_t_dec)
+    n_hidden_s = mlh.parse_int_list_arg(args.n_hidden_s)
+    embedding_source = args.embedding_source
+    num_epochs = int(args.num_epochs)
+    learning_rate = args.learning_rate
+    learning_rate_annealing = args.learning_rate_annealing
+    alpha = args.alpha
+    beta = args.beta
+    gamma = args.gamma
+    lmd = args.lmd
+    disc_nonlinearity = args.disc_nonlinearity
+    encoder_net_init = args.encoder_net_init
+    decoder_net_init = args.decoder_net_init
+    optimizer = args.optimizer
+    max_patience = args.patience
+    batchnorm = args.batchnorm
+    keep_labels = args.keep_labels
+    prec_recall_cutoff = (args.prec_recall_cutoff != 0)
+    missing_labels_val = -1
+    which_fold = args.which_fold
+    early_stop_criterion = args.early_stop_criterion
+    save_path = args.save_tmp
+    save_copy = args.save_perm
+    dataset_path = args.dataset_path
+    resume = args.resume
+    exp_name = args.exp_name
+    random_proj = int(args.random_proj)
 
     # Prepare embedding information
     if embedding_source is None or embedding_source == 'raw':
@@ -374,8 +393,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             if embedding_source is None:
                 # Save embedding
                 pred = pred_feat_emb()
-                np.savez(os.path.join(save_path, 'feature_embedding.npz'),
-                         pred)
+                np.savez(os.path.join(save_path, 'feature_embedding.npz'), pred)
 
             # Training set results
             train_minibatches = mlh.iterate_minibatches(x_train, y_train,
@@ -393,24 +411,17 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
             # Test set results
             if y_test is not None:
-                test_minibatches = mlh.iterate_minibatches(x_test, y_test,
-                                                           138,
-                                                           shuffle=False)
+                test_minibatches = mlh.iterate_minibatches(x_test, y_test, 138, shuffle=False)
 
-                test_err = mlh.monitoring(test_minibatches, 'test', val_fn,
-                                          monitor_labels, prec_recall_cutoff)
+                test_err = mlh.monitoring(test_minibatches, 'test', val_fn, monitor_labels, prec_recall_cutoff)
             else:
-                for minibatch in mlh.iterate_testbatches(x_test,
-                                                         138,
-                                                         shuffle=False):
+                for minibatch in mlh.iterate_testbatches(x_test, 138, shuffle=False):
                     test_predictions = []
                     test_predictions += [predict(minibatch)]
-                np.savez(os.path.join(save_path, 'test_predictions.npz'),
-                         test_predictions)
+                np.savez(os.path.join(save_path, 'test_predictions.npz'), test_predictions)
 
             # Stop
-            print('epoch time:{:6.3f}s'.format(time.time() -
-                                                         start_time))
+            print('epoch time:{:6.3f}s'.format(time.time() - start_time))
             break
 
         print('epoch time:{:6.3f}s'.format(time.time() - start_time))
@@ -427,7 +438,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         copy_tree(save_path, save_copy)
 
 def main():
-    parser = argparse.ArgumentParser(description='''Train Diet Networks''')
+    parser = argparse.ArgumentParser(description='Train Diet Networks')
     parser.add_argument('--dataset', default='1000_genomes', help='Dataset.')
     parser.add_argument('--n_hidden_u', default=[100], help='List of unsupervised hidden units.')
     parser.add_argument('--n_hidden_t_enc', default=[100], help='List of theta transformation hidden units.')
@@ -435,13 +446,13 @@ def main():
     parser.add_argument('--n_hidden_s', default=[100], help='List of supervised hidden units.')
     parser.add_argument('--embedding_source', default='histo3x26',
             help='Source for the feature embedding. Either None or the name of a file from which to load a learned embedding')
-    parser.add_argument('--num_epochs', '-ne', type=int, default=500, help='''Int to indicate the max number of epochs.''')
-    parser.add_argument('--learning_rate', '-lr', type=float, default=0.0001, help='''Float to indicate learning rate.''')
+    parser.add_argument('--num_epochs', '-ne', type=int, default=500, help='Int to indicate the max number of epochs.')
+    parser.add_argument('--learning_rate', '-lr', type=float, default=0.0001, help='Float to indicate learning rate.')
     parser.add_argument('--learning_rate_annealing', '-lra', type=float, default=.99, help='Float to indicate learning rate annealing rate.')
-    parser.add_argument('--alpha', '-a', type=float, default=0., help='''reconst_loss coeff. for auxiliary net W_enc''')
-    parser.add_argument('--beta', '-b', type=float, default=0., help='''reconst_loss coeff. for auxiliary net W_dec''')
-    parser.add_argument('--gamma', '-g', type=float, default=10., help='''reconst_loss coeff. (used for aux net W-dec as well)''')
-    parser.add_argument('--lmd', '-l', type=float, default=.0, help='''Weight decay coeff.''')
+    parser.add_argument('--alpha', '-a', type=float, default=0., help='reconst_loss coeff. for auxiliary net W_enc')
+    parser.add_argument('--beta', '-b', type=float, default=0., help='reconst_loss coeff. for auxiliary net W_dec')
+    parser.add_argument('--gamma', '-g', type=float, default=10., help='reconst_loss coeff. (used for aux net W-dec as well)')
+    parser.add_argument('--lmd', '-l', type=float, default=.0, help='Weight decay coeff.')
     parser.add_argument('--disc_nonlinearity', '-nl', default='softmax', help='''Nonlinearity to use in disc_net's last layer''')
     parser.add_argument('--encoder_net_init', '-eni', type=float, default=0.01, help='Bounds of uniform initialization for encoder_net weights')
     parser.add_argument('--decoder_net_init', '-dni', type=float, default=0.01, help='Bounds of uniform initialization for decoder_net weights')
@@ -451,7 +462,8 @@ def main():
     parser.add_argument('--keep_labels', type=float, default=1.0, help='Fraction of training labels to keep')
     parser.add_argument('--prec_recall_cutoff', type=int, default=0, help='Whether to compute the precision-recall cutoff or not')
     parser.add_argument('--which_fold', type=int, default=0, help='Which fold to use for cross-validation (0-4)')
-    parser.add_argument('--early_stop_criterion', default='accuracy', help='What monitored variable to use for early-stopping')
+    parser.add_argument('--early_stop_criterion', default='accuracy', choices=['accuracy', 'loss_sup_det'],
+            help='What monitored variable to use for early-stopping')
     parser.add_argument('--save_tmp', default= './', help='Path to save results.')
     parser.add_argument('--save_perm', default='./', help='Path to save results.')
     parser.add_argument('--dataset_path', default='./', help='Path to dataset')
@@ -464,35 +476,7 @@ def main():
     print('Printing args')
     print(vars(args))
 
-    execute(args.dataset,
-            mlh.parse_int_list_arg(args.n_hidden_u),
-            mlh.parse_int_list_arg(args.n_hidden_t_enc),
-            mlh.parse_int_list_arg(args.n_hidden_t_dec),
-            mlh.parse_int_list_arg(args.n_hidden_s),
-            args.embedding_source,
-            int(args.num_epochs),
-            args.learning_rate,
-            args.learning_rate_annealing,
-            args.alpha,
-            args.beta,
-            args.gamma,
-            args.lmd,
-            args.disc_nonlinearity,
-            args.encoder_net_init,
-            args.decoder_net_init,
-            args.optimizer,
-            args.patience,
-            args.batchnorm,
-            args.keep_labels,
-            args.prec_recall_cutoff != 0, -1,
-            args.which_fold,
-            args.early_stop_criterion,
-            args.save_tmp,
-            args.save_perm,
-            args.dataset_path,
-            args.resume,
-            args.exp_name,
-            int(args.random_proj))
+    execute(args)
 
 if __name__ == '__main__':
     main()

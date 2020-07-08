@@ -58,8 +58,7 @@ def prune_splits(splits, nb_prune):
         normalization_constant = 1.0 / sum(splits)
     return [s * normalization_constant for s in splits[:-nb_prune]]
 
-def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
-                      nolabels='raw', fold=0, norm=True, path=''):
+def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None, nolabels='raw', fold=0, norm=True, path=''):
 
     if nolabels == 'raw' or not transpose:
         # Load raw data either for supervised or unsupervised part

@@ -1,10 +1,9 @@
 import numpy as np
 import sys
 import os
-
 from common import dataset_utils
 
-def generate_1000_genomes_hist(transpose=False, label_splits=None, feature_splits=None, fold=0, perclass=False, path = ''):
+def generate_1000_genomes_hist(transpose=False, label_splits=None, feature_splits=None, fold=0, perclass=False, path=''):
     '''
     train, valid, test, _ = du.load_1000_genomes(transpose, label_splits, feature_splits, fold, norm=False)
     '''
@@ -27,7 +26,7 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None, feature_split
         nolabel_x = np.zeros((nolabel_orig.shape[0], 3*26))
         for i in range(nolabel_x.shape[0]):
             if i % 5000 == 0:
-                print("processing snp no: ", i)
+                print('processing snp no: ', i)
             for j in range(26):
                 nolabel_x[i, j*3:j*3+3] += \
                     np.bincount(nolabel_orig[i, nolabel_y == j ].astype('int32'), minlength=3)
@@ -41,15 +40,14 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None, feature_split
     else:
         nolabel_x = np.zeros((nolabel_orig.shape[0], 3))
         for i in range(nolabel_x.shape[0]):
-            nolabel_x[i, :] += np.bincount(nolabel_orig[i, :].astype('int32'),
-                                           minlength=3)
+            nolabel_x[i, :] += np.bincount(nolabel_orig[i, :].astype('int32'), minlength=3)
             nolabel_x[i, :] /= nolabel_x[i, :].sum()
 
     nolabel_x = nolabel_x.astype('float32')
 
     np.save(os.path.join(path, filename), nolabel_x)
 
-def generate_1000_genomes_bag_of_genes(transpose=False, label_splits=None, feature_splits=[0.8], fold=0, path = ''):
+def generate_1000_genomes_bag_of_genes(transpose=False, label_splits=None, feature_splits=[0.8], fold=0, path=''):
 
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose, label_splits=label_splits,
                                                  feature_splits=feature_splits, fold=fold,
@@ -75,7 +73,7 @@ def generate_1000_genomes_bag_of_genes(transpose=False, label_splits=None, featu
     nolabel_x[mod1] += 1
     nolabel_x[mod2] += 1
 
-def generate_1000_genomes_snp2bin(transpose=False, label_splits=None, feature_splits=None, fold=0, path = ''):
+def generate_1000_genomes_snp2bin(transpose=False, label_splits=None, feature_splits=None, fold=0, path=''):
 
     train, valid, test, _ = dataset_utils.load_1000_genomes(transpose=transpose, label_splits=label_splits,
                                                      feature_splits=feature_splits, fold=fold, norm=False)
@@ -96,6 +94,5 @@ if __name__ == '__main__':
     path = sys.argv[1]
 
     for fold in range(nfold):
-        print(fold)
-        generate_1000_genomes_hist(transpose=False, label_splits=[.75],
-                                   feature_splits=[1.], fold=fold, perclass=True, path=path)
+        print('Fold number is %d/%d' % (fold, nfold))
+        generate_1000_genomes_hist(transpose=False, label_splits=[.75], feature_splits=[1.], fold=fold, perclass=True, path=path)

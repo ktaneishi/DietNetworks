@@ -12,14 +12,13 @@ def replace_inplace(arr, to_replace, replace_with):
     arr += (arr == to_replace) * (replace_with - to_replace)
 
 def trim_dataset():
-    
     # Load the existing data
     o_data = numpy.load('/data/lisatmp4/dejoieti/ma_dataset.npy')
     
     # Step 1 : remove from the dataset all the features that have only
     # one possible value or two possible values but one of those is 'missing'
     # (0).
-    print("Step 1")
+    print('Step 1')
     
     features_to_keep = []
     for i in range(o_data.shape[1]):
@@ -36,7 +35,7 @@ def trim_dataset():
     n_data = o_data[:,features_to_keep]
     
     # Step 2 : Replace any single-letter SNP by the double letter equivalent
-    print("Step 2")
+    print('Step 2')
     
     numpy.place(n_data, n_data == snp_to_int['A'], snp_to_int['AA'])
     numpy.place(n_data, n_data == snp_to_int['C'], snp_to_int['CC'])
@@ -47,7 +46,7 @@ def trim_dataset():
     
     # Step 3 : Change the feature's representation from categories to additive
     # coding.
-    print("Step 3")
+    print('Step 3')
     
     for i in range(n_data.shape[1]):
         # Let the user know how much we've done so far.
@@ -55,11 +54,11 @@ def trim_dataset():
             print(i, n_data.shape[1])
         
         # Determine the major allele for this feature
-        allele_counts = {"A": 0, "C": 0, "D": 0, "G": 0, "I": 0, "T": 0}
+        allele_counts = {'A': 0, 'C': 0, 'D': 0, 'G': 0, 'I': 0, 'T': 0}
         
         for snp in snp_to_int.keys():
             
-            if snp != "--":
+            if snp != '--':
 
                 # Determine how many times the SNP occurs in this feature
                 snp_count = (n_data[:,i] == snp_to_int[snp]).sum()
@@ -79,7 +78,7 @@ def trim_dataset():
         tmp = n_data[:, i].copy()
         
         for snp in snp_to_int.keys():
-            if snp != "--":
+            if snp != '--':
                 if len(snp) == 2:
                     nb_occ = (snp[0] == major_allele) + (snp[1] == major_allele)
                 elif len(snp) == 1:
@@ -89,9 +88,9 @@ def trim_dataset():
         n_data[:, i] = tmp
     
     # Final step : Save the new dataset to disk
-    print("Saving to disk")
+    print('Saving to disk')
     
     numpy.save('/data/lisatmp4/carriepl/ma_dataset_trimmed.npy', n_data)
     
-if __name__ == "__main__":
+if __name__ == '__main__':
     trim_dataset()

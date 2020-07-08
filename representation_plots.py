@@ -50,7 +50,7 @@ which_set = 'test'
 category = 'ethnicity'
 tsne_n_comps = 2
 
-path = '/data/lisatmp4/romerosa/DietNetworks/subjects/histo3x26/fold' + str(fold)
+path = 'subjects/histo3x26/fold' + str(fold)
 
 file_to_load = os.path.join(path, layer + '_' + which_set + '.npz')
 data = np.load(file_to_load)

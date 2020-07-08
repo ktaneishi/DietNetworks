@@ -3,48 +3,48 @@ import os
 
 def list_files(data_dir):
     def aux_fitbit(s):
-        x = s.split("_")
+        x = s.split('_')
         if len(x) < 2:
             return False
-        return x[1] == "fitbit"
+        return x[1] == 'fitbit'
     # print os.listdir(data_dir)
     l = set(os.listdir(data_dir))
 
     data = {}
-    data["23_and_me"] = list(filter(lambda l: l.endswith("23andme.txt"), l))
-    l -= set(data["23_and_me"])
+    data['23_and_me'] = list(filter(lambda l: l.endswith('23andme.txt'), l))
+    l -= set(data['23_and_me'])
 
-    data["ancestry"] = list(filter(lambda l: l.endswith("ancestry.txt"), l))
-    l -= set(data["ancestry"])
+    data['ancestry'] = list(filter(lambda l: l.endswith('ancestry.txt'), l))
+    l -= set(data['ancestry'])
 
-    data["ftdna-illumina"] = list(filter(lambda l: l.endswith(
-            "ftdna-illumina.txt"), l))
-    l -= set(data["ftdna-illumina"])
+    data['ftdna-illumina'] = list(filter(lambda l: l.endswith(
+            'ftdna-illumina.txt'), l))
+    l -= set(data['ftdna-illumina'])
 
-    data["exome-vcf"] = list(filter(lambda l: l.endswith("exome-vcf.txt"), l))
-    l -= set(data["exome-vcf"])
+    data['exome-vcf'] = list(filter(lambda l: l.endswith('exome-vcf.txt'), l))
+    l -= set(data['exome-vcf'])
 
-    data["decodeme"] = list(filter(lambda l: l.endswith("decodeme.txt"), l))
-    l -= set(data["decodeme"])
+    data['decodeme'] = list(filter(lambda l: l.endswith('decodeme.txt'), l))
+    l -= set(data['decodeme'])
 
-    data["fitbit"] = list(filter(lambda l: aux_fitbit(l), l))
-    l -= set(data["fitbit"])
+    data['fitbit'] = list(filter(lambda l: aux_fitbit(l), l))
+    l -= set(data['fitbit'])
 
-    data["IYG"] = list(filter(lambda l: l.endswith("IYG.txt"), l))
-    l -= set(data["IYG"])
+    data['IYG'] = list(filter(lambda l: l.endswith('IYG.txt'), l))
+    l -= set(data['IYG'])
 
-    data["CSVs"] = list(filter(lambda l: l.endswith(".csv"), l))
-    l -= set(data["CSVs"])
+    data['CSVs'] = list(filter(lambda l: l.endswith('.csv'), l))
+    l -= set(data['CSVs'])
 
-    data["unused"] = list(l)
+    data['unused'] = list(l)
 
     return data
 
 def parse_illumina(filename):
     l = []
-    with open(filename, "r") as input_file:
+    with open(filename, 'r') as input_file:
         for line in input_file:
-            temp = line.split(",")
+            temp = line.split(',')
             temp = list(map(lambda l: l.strip('"\n'), temp))
             assert(len(temp) == 4)
 
@@ -53,11 +53,11 @@ def parse_illumina(filename):
 
 def parse_23_and_me(filename):
     l = []
-    # with open(filename,"r",encoding="utf-8",errors='ignore') as input_file:
-    with open(filename, "r") as input_file:
+    # with open(filename,'r',encoding='utf-8',errors='ignore') as input_file:
+    with open(filename, 'r') as input_file:
         for line in input_file:
-            if not line.startswith("#"):
-                temp = line.split("\t")
+            if not line.startswith('#'):
+                temp = line.split('\t')
                 temp = list(map(lambda l: l.strip(), temp))
                 # if not (len(temp) == 4):
                 #    print (temp)
@@ -83,11 +83,11 @@ def add_dicts_validate(dict1, dict2):
 
 def parse_23_and_me_dict(filename, feature_values_dict):
     d = {}
-    # with open(filename,"r",encoding="utf-8",errors='ignore') as input_file:
-    with open(filename, "r") as input_file:
+    # with open(filename,'r',encoding='utf-8',errors='ignore') as input_file:
+    with open(filename, 'r') as input_file:
         for line in input_file:
-            if not line.startswith("#"):
-                temp = line.split("\t")
+            if not line.startswith('#'):
+                temp = line.split('\t')
                 temp = list(map(lambda l: l.strip(), temp))
                 assert (len(temp) == 4)
 
@@ -110,8 +110,8 @@ def load_data23andme(data_path='/data/lisatmp4/erraqabi', split=[.6, .2, .2], sh
     # splitting dataset
 
     np.random.seed(seed)
-    data = np.load(data_path+'/ma_dataset.npy')
-    labels = np.load(data_path+'/height_ma_dataset.npy')
+    data = np.load(data_path + '/ma_dataset.npy')
+    labels = np.load(data_path + '/height_ma_dataset.npy')
     n_data = len(labels)
     end_train = int(split[0]*n_data)
     end_val = int(split[1]*n_data)
@@ -193,7 +193,7 @@ def load_data23andme_baselines(data_path='/data/lisatmp4/carriepl', shuffle=Fals
 
     return train_supervised, test_supervised, unsupervised
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     split = [.6, .2, .2]
 
     def map_to_float(s):
@@ -203,7 +203,7 @@ if __name__ == "__main__":
         else:
             return float(s)
 
-    height = np.genfromtxt('/data/lisatmp4/dejoieti/height.csv', dtype=None, delimiter="\t")
+    height = np.genfromtxt('/data/lisatmp4/dejoieti/height.csv', dtype=None, delimiter='\t')
     height = height[1:, :]
     height[:, 1] = map(map_to_float, height[:, 1])
     height = height.astype(float)  # from str to float
@@ -216,16 +216,16 @@ if __name__ == "__main__":
     # users_id_w_height_str = ['user'+str(el) for el in users_id_w_height]
 
     # constructing dataset
-    data_dir = "/data/lisatmp4/sylvaint/data/openSNP"
+    data_dir = '/data/lisatmp4/sylvaint/data/openSNP'
     files = list_files(data_dir)
 
     # print (type(files))
-    # print (type(files["ftdna-illumina"]))
-    # test_file = os.path.join(data_dir,files["ftdna-illumina"][0])
+    # print (type(files['ftdna-illumina']))
+    # test_file = os.path.join(data_dir,files['ftdna-illumina'][0])
     # print (test_file)
-    test_file = os.path.join(data_dir, files["23_and_me"][0])
+    test_file = os.path.join(data_dir, files['23_and_me'][0])
     # print (parse_illumina(test_file))
-    print ("Parsing 23 and me data")
+    print ('Parsing 23 and me data')
 
     feature_values_dict = {'A': 1, 'AA': 2, 'AC': 3, 'AG': 4, 'AT': 5,
                            'C': 6, 'CC': 7, 'CG': 8, 'CT': 9, 'D': 10,
@@ -235,10 +235,10 @@ if __name__ == "__main__":
 
     data23andme = {}
     height_data23andme = {}
-    for index, filename in enumerate(files["23_and_me"]):
-        print("Processing %i out of %i" % (index, len(files["23_and_me"])))
+    for index, filename in enumerate(files['23_and_me']):
+        print('Processing %i out of %i' % (index, len(files['23_and_me'])))
         input_file = os.path.join(data_dir, filename)
-        user_id = filename.split("_")[0]
+        user_id = filename.split('_')[0]
         try:
             temp_dict = parse_23_and_me_dict(input_file, feature_values_dict)
 
@@ -251,7 +251,7 @@ if __name__ == "__main__":
                 else:
                     height_data23andme[user_id] = -1
         except:
-            print("Skipping user", user_id)
+            print('Skipping user', user_id)
         # if index == 10:
         #     break
 
@@ -270,7 +270,7 @@ if __name__ == "__main__":
 
     # Step 2 : allocate a numpy array large enough to contain the results
     shape = (len(data23andme.keys()), len(feature_dict.keys()))
-    arr = np.zeros(shape, "int32")
+    arr = np.zeros(shape, 'int32')
     arr_height = np.zeros((shape[0], 1))
     # Step 3 : go over the dict of dicts and insert the data in the allocated
     # array.
@@ -287,6 +287,7 @@ if __name__ == "__main__":
             feature_idx = feature_dict[feature_id]
             arr[user_idx, feature_idx] = feature_value
     arr_height = arr_height.squeeze()
+
     # Save the result to disk
-    np.save("/data/lisatmp4/erraqabi/ma_dataset.npy", arr)
-    np.save("/data/lisatmp4/erraqabi/height_ma_dataset.npy", arr_height)
+    np.save('/data/lisatmp4/erraqabi/ma_dataset.npy', arr)
+    np.save('/data/lisatmp4/erraqabi/height_ma_dataset.npy', arr_height)

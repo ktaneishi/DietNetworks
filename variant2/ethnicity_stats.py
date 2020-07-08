@@ -1,6 +1,5 @@
 import numpy as np
 import argparse
-
 from common import dataset_utils
 
 def execute(dataset, dataset_path):

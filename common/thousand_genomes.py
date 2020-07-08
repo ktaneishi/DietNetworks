@@ -2,8 +2,8 @@ import numpy as np
 import os
 
 def load_data(path='', force_npz_recreation=False):
-    dataset_file = 'affy_6_biallelic_snps_maf005_thinned_aut_dataset.npz'
-    genome_file = 'affy_6_biallelic_snps_maf005_thinned_aut_A.raw'
+    dataset_file = 'affy_6_biallelic_snps_maf005_aut_thinned_dataset.npz'
+    genome_file = 'affy_6_biallelic_snps_maf005_aut_thinned_A.raw'
     label_file = '../data/affy_samples.20141118.panel'
     
     if os.path.exists(os.path.join(path, dataset_file)) and not force_npz_recreation:
@@ -46,7 +46,7 @@ def load_data(path='', force_npz_recreation=False):
 
     # Save the parsed data to the filesystem
     print('Saving parsed data to a binary format for faster loading in the future.')
-    np.savez(path + dataset_file, genomic=genomic_data, label=label_data)
+    np.savez(os.path.join(path, dataset_file), genomic=genomic_data, label=label_data)
 
     return genomic_data, label_data
 
